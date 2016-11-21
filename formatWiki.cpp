@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
     string command;
     for (int i = 0; i < tags.size(); ++i) {
         cout << "tag: " << tags[i] << endl;
-        command = "./changeWiki -t " + tags[i] + " -m " + wiki_msg;
+        command = "./changeWiki.sh -t " + tags[i] + " -m " + wiki_msg;
         // Now for each tag, if the file already exist, then just append it to the sentence
         // else run another script where the file would be created, and the the sentence
         // would be appended
