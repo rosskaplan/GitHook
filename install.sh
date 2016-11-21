@@ -22,3 +22,8 @@ git --git-dir=.wiki remote add wiki $new_link
 # Step 3 : Set up post-commit into .git
 mv post-commit .git/hooks/post-commit
 chmod +x .git/hooks/post-commit
+
+# Step 4 : Populate the database with all the necessary information, including
+# repo name, username etc
+
+./setup -u "$GIT_AUTHOR_EMAIL" -e "$GIT_AUTHOR_NAME"

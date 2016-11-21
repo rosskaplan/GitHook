@@ -1,2 +1,2 @@
-test : test.cpp
-	g++ -g -std=c++11 test.cpp -o test -lmysqlclient
+setup : setup.cpp
+	g++ -g -std=c++11 setup.cpp -o setup -lmysqlclient
