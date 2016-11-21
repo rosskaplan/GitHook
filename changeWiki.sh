@@ -1,6 +1,5 @@
 #!/bin/sh
 
-$OPTIND = 1
 tag_name=""
 message=""
 
@@ -10,10 +9,11 @@ while getopts "mt:" opt; do
         t) tag_name=$OPTARG
             ;;
         m) message=$OPTARG
+            ;;
     esac
 done
 
-if [! -f $tag_name.md ]; then
+if [ ! -f $tag_name.md ]; then
     touch $tag_name.md
 fi
 
