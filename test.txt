@@ -1,6 +1,7 @@
 haaaa
 This is a test commit
 haaaa
+<<<<<<< HEAD
 This is a test commit
 haaaa
 mytmy
@@ -16,3 +17,5 @@ hahhahhahaa
 hahhahhahaa
 hahhahhahaa
 hahhahhahaa
+=======
+>>>>>>> aefbfce592c0a9ef81e9568cae1a52e64e3e4de8
