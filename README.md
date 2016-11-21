@@ -12,4 +12,4 @@ After parsing, it's passed to a C++ script which is responsible for communicatin
 
 Updates the Github's wiki with the returned data from the database to make documentation write it by itself!
 ## Setup: 
-run `bash ./install.sh`
+run `bash ./install/install.sh`
