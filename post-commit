@@ -4,12 +4,15 @@
 msg=$(git log --pretty=oneline -1)
 files=$(git log --pretty="format:" --name-only -1)
 
-g++ myProg.cpp -o myProg
+
+g++ callDatabase.cpp -o callDatabase
 ./myProg -e "$GIT_AUTHOR_EMAIL" -n "$GIT_AUTHOR_NAME" -d "$GIT_AUTHOR_DATE" -m "$msg" -f "$files"
 
 # put it on the wiki, only a test environment
 
-echo "This is a test commit" >> test.txt
+# run a program that queries the database and update the affected pages
+# need to ask sable how to do this part
+echo "This is a test commit 2" >> test.txt
 git wiki add Home.md
 git wiki commit -m "commiting"
 git push wiki master
