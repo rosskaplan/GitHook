@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OPTIND = 1
+$OPTIND = 1
 tag_name=""
 message=""
 
@@ -19,8 +19,8 @@ fi
 
 message >> $tag_name.md
 
-git wiki add $tag_name.md 
-git wiki commit -m $message
+git --git-dir=.wiki add $tag_name.md 
+git --git-dir=.wiki commit -m $message
 git push wiki master
 
 
