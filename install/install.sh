@@ -25,5 +25,5 @@ chmod +x .git/hooks/post-commit
 
 # Step 4 : Populate the database with all the necessary information, including
 # repo name, username etc
-
+make
 ./setup -u "$GIT_AUTHOR_EMAIL" -e "$GIT_AUTHOR_NAME"
