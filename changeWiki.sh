@@ -3,7 +3,7 @@
 tag_name=""
 message=""
 
-while getopts "mt:" opt; do
+while getopts "m:t:" opt; do
 
     case "$opt" in
         t) tag_name=$OPTARG
@@ -19,8 +19,8 @@ fi
 
 message >> $tag_name.md
 
-git --git-dir=.wiki add $tag_name.md 
-git --git-dir=.wiki commit -m $message
+git wiki add $tag_name.md 
+git wiki commit -m $message
 git push wiki master
 
 
