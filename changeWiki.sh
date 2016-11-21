@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 $OPTIND = 1
 tag_name=""
