@@ -1,4 +1,3 @@
-
 #!/bin/sh
 
 tag_name=""
