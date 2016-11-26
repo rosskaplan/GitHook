@@ -12,4 +12,8 @@ After parsing, it's passed to a C++ script which is responsible for communicatin
 
 Updates the Github's wiki with the returned data from the database to make documentation write it by itself!
 ## Setup: 
-run `bash ./install/install.sh`
+download the github repository
+
+place the folder into the .git folder
+
+run `bash ./install/install.sh` inside the .git folder
