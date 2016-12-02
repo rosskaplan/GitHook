@@ -14,17 +14,18 @@ cd ../..
 git submodule add $new_link wiki
 git submodule init wiki
 git submodule update wiki
-
+pwd
 cd .git
 
 # Step 3 : Set up post-commit into .git
 mv GitHook-master/install/post-commit ./hooks/post-commit
 chmod +x ./hooks/post-commit
 
-cd ../..
+cd ..
 
 git ls-files # show all the files in git
 
+cd .git
 cd GitHook-master
 cd install
 
