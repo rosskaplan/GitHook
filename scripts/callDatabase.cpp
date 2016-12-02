@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -74,13 +75,31 @@ int main(int argc, char** argv) {
     string command;
     for (int i = 0; i < tags.size(); ++i) {
         cout << "tag: " << tags[i] << endl;
-        command = "./changeWiki -t " + tags[i] + " -m " + wiki_msg;
-        // Now for each tag, if the file already exist, then just append it to the sentence
-        // else run another script where the file would be created, and the the sentence
-        // would be appended
-        // TODO: This could get complicated, but let's finish the base case first
-        system(command.c_str());
+        // see whether tag exist in the db
+        // system(command.c_str());
     }
 
     return 0;
 }
+
+
+// This function takes in a tag and makes a new page
+void docuwrite(string tag, string hash, string name, string message, string date, ofstream outfile){
+    
+    outfile << "## " << tag << endl;
+    outfile << endl;
+    
+    string final_msg = "["+hash+"]" + name + " : " + message;
+    outfile << final_msg << endl;
+    outfile << endl;
+
+    final_msg = "Date :" + date;
+    outfile << final_msg << endl;
+    outfile << endl;
+
+    outfile << endl;
+    outfile.close();
+}
+
+
+
