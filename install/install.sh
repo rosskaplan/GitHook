@@ -8,20 +8,25 @@ new_link="${repo_link::-4}.wiki.git"
 repo_name="$(git remote show -n origin | grep Fetch | cut -d. -d/ -f5-)"
 repo_real_name="${repo_name::-4}"
 author_name="$(git config --global user.name)"
+
+cd ../..
 # Step 2 : Initialize empty wiki repository
 git submodule add $new_link wiki
 git submodule init wiki
 git submodule update wiki
 
+cd .git
+
 # Step 3 : Set up post-commit into .git
-mv post-commit ../../.git/hooks/post-commit
-chmod +x ../../.git/hooks/post-commit
+mv post-commit ./hooks/post-commit
+chmod +x ./hooks/post-commit
 
 cd ../..
 
 git ls-files # show all the files in git
 
 cd githook
+cd GitHook-master
 cd install
 
 # Step 4 : Populate the database with all the necessary information, including
