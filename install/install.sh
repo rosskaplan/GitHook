@@ -9,17 +9,9 @@ repo_name="$(git remote show -n origin | grep Fetch | cut -d. -d/ -f5-)"
 repo_real_name="${repo_name::-4}"
 author_name="$(git config --global user.name)"
 # Step 2 : Initialize empty wiki repository
-# mv .git .temp
-#git init 
-#mv .git .wiki
-#mv .temp .git
-#rm -rf .temp
-
-#git remote add origin $repo_link
-
-#git --git-dir=.wiki add Home.md
-#git --git-dir=.wiki commit -m "first commit"
-#git --git-dir=.wiki remote add wiki $new_link
+git submodule add $new_link wiki
+git submodule init wiki
+git submodule update wiki
 
 # Step 3 : Set up post-commit into .git
 mv post-commit ../../.git/hooks/post-commit
