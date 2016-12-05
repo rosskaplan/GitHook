@@ -5,7 +5,22 @@
 #include <vector>
 #include <cstdio>
 #include <cstring>
+#include <errno.h>
+#include <string.h>
+#include <time.h>
+
+#include <mysql/mysql.h>
+
 using namespace std;
+
+bool insertUser(string username);
+void finish_with_error(MYSQL *con, int n);
+
+#define IP_ADDR "199.98.20.115"
+#define UID "gordon"
+#define PWD "gordon2"
+#define PORT 3306
+#define DBNAME "githook"
 
 int main(int argc, char** argv) {
 
@@ -13,26 +28,45 @@ int main(int argc, char** argv) {
     vector<string> files, tags;
     int count = 0;
     string tagtemp;
+
     for (int i = 0; i < argc; i++) {
         if (strcmp(argv[i], "-e") == 0) {
             email = argv[i+1];
         }
         if (strcmp(argv[i], "-n") == 0) {
-            name = argv[i+1];
+            //name = argv[i+1];
+            ++i;
+            while (strcmp(argv[i], "-d") != 0) { //while not equal
+                name += argv[i];
+                name+= " ";
+                ++i;
+            }
+            name.pop_back(); //removes trailing space
         }
         if (strcmp(argv[i], "-d") == 0) {
             date = argv[i+1];
         }
         if (strcmp(argv[i], "-m") == 0) {
-            temp = argv[i+1];
+            //temp = argv[i+1];
+            ++i;
+            while(strcmp(argv[i],"-f") != 0) { //While not equal
+                temp += argv[i];
+                temp += " ";
+                ++i;
+            }
+            temp.pop_back(); //removes trailing space
+
+            cout << "temp: \"" << temp << "\" " << endl;
             hash = temp.substr(0, 40);
+            cout << "temp: \"" << temp << "\" " << endl;
             temp = temp.substr(41, temp.length()-41);
+            cout << "temp: \"" << temp << "\" " << endl;
             for (int j = 0; j < temp.length(); j++) {
                 if (temp[j] == '*')
                     ++count;
             }
             if (count % 2 == 1) {
-                cout << "There are an odd number of stars.  This commit will not be added to the wiki." << endl;
+                cerr << "There are an odd number of stars.  This commit will not be added to the wiki." << endl;
                 return 1;
             }
             count = 0;
@@ -50,6 +84,7 @@ int main(int argc, char** argv) {
                 }
             }
             message = tagtemp;
+            message.erase(0,1);
         }
         if (strcmp(argv[i], "-f") == 0) {
             i++;
@@ -79,12 +114,82 @@ int main(int argc, char** argv) {
         // system(command.c_str());
     }
 
+    //Time to insert all information into database as necessary
+
+    if (!insertUser(name)) {
+        cerr << "Failed to add user to database." << endl;
+        exit(-1);
+    }
+
     return 0;
+
 }
 
+bool insertUser(string username) {
+
+    MYSQL *handler;
+    MYSQL *mysql;
+
+    // Initializing MYSQL handler, which would be useful when initializing connection
+    // with server
+    if ((mysql = mysql_init(NULL)) == NULL){
+        finish_with_error(mysql,1);
+        return 0;
+    }
+
+    // Connecting to the database
+    if (mysql_real_connect(mysql, IP_ADDR, UID, PWD, DBNAME ,PORT,NULL,0) == NULL){
+        finish_with_error(mysql,2);
+        return 0;
+    }
+
+    // Execute a query in the database
+    if (mysql_query(mysql, "SELECT * FROM users;")){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+
+    // Store the result of the query
+    MYSQL_RES * result = mysql_store_result(mysql);
+    if (result == NULL){
+        finish_with_error(mysql, 4);
+        return 0;
+    }
+
+    int num_fields = mysql_num_fields(result);
+    // Show the result of the query
+    MYSQL_ROW row;
+    while ((row=mysql_fetch_row(result))){
+        for (int i = 0 ; i < num_fields; i++){
+            if (((string)row[i]).compare(username) == 0) {
+                //Success: user already in database
+                mysql_free_result(result);
+                mysql_close(mysql);
+                return 1;
+            }
+        }
+    }
+    char buffer[200];
+    int length = sprintf(buffer, "INSERT INTO users (uname) VALUES ('%s');", username.c_str());
+    buffer[length] = '\0';
+    if (mysql_query(mysql, buffer)){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+    
+    num_fields = mysql_num_fields(result);
+    // Show the result of the query
+    
+    // Free the memory that stores the result
+    mysql_free_result(result);
+    // Close connection with databse
+    mysql_close(mysql);
+
+    return 1;
+}
 
 // This function takes in a tag and makes a new page
-void docuwrite(string tag, string hash, string name, string message, string date, ofstream outfile){
+/*void docuwrite(string tag, string hash, string name, string message, string date, ofstream outfile){
     
     outfile << "## " << tag << endl;
     outfile << endl;
@@ -102,4 +207,9 @@ void docuwrite(string tag, string hash, string name, string message, string date
 }
 
 
+*/
 
+void finish_with_error(MYSQL *con, int n){
+    fprintf(stderr,"ERROR! %d %s\n", n, mysql_error(con));
+    mysql_close(con);
+}
