@@ -22,3 +22,10 @@ To commit with tags of your own choice:
 3. Change directory with `cd ./.git`
 4. Unzip the zip file with `unzip GitHook-master.zip`
 5. Change directory with `cd ./GitHook-master` and run installation script `bash install/install.sh`
+
+## Ideas for functionality
+
+1. Full import 
+2. Full export
+3. Access level for public repo vs private repo
+4. Query 
