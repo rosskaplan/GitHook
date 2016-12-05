@@ -20,10 +20,13 @@ int main(int argc ,char ** argv){
     MYSQL *con;
     MYSQL_ROW row;
     MYSQL_RES * result;
-    string rurl, rid,q;
+    string rurl, rid,q, uname;
+    int access = 0;
     for (int i = 0 ; i < argc; i++){
         if (strcmp(argv[i], "-n") == 0){
             rurl = argv[i+1];
+        }else if (strcmp(argv[i], "-u") == 0){
+            uname = argv[i+1];
         }
     }
 
@@ -34,6 +37,24 @@ int main(int argc ,char ** argv){
     if (mysql_real_connect(con, IP_ADDR, UID, PWD, DBNAME, PORT, NULL, 0) == NULL){
         finish_with_error(con, "connecting to database");
     }
+
+    // Security check, see whether the user can access to the repository first
+    q = "SELECT DISTINCT U.uname FROM users U, works_in WI, repo R WHERE R.rurl='"+rurl+"' and U.uname='"+uname+"' and U.uname=WI.uname and WI.rid=R.rid";
+
+    if (mysql_query(con, q.c_str()) != 0){
+        finish_with_error(con, "querying the database");
+    }
+    result = mysql_store_result(con);
+    while(result == NULL){
+        finish_with_error(con, "storing result from query");
+    }
+    access = mysql_num_rows(result);
+
+    if (!access){
+        cout << "You do not work in this repo -- you do not have access to " << rurl << endl;
+        exit(1);
+    }
+    mysql_free_result(result);
     
     // get the repo name, url and wiki url first
     q = "SELECT DISTINCT R.rname, R.rurl, WIKI.wurl, R.rid FROM repo R, wiki WIKI WHERE R.rurl='"+rurl+"' and WIKI.repoid = R.rid;";
