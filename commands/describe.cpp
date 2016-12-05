@@ -4,38 +4,78 @@
 
 #include <iostream>
 #include <string.h>
-#include <creds.h>
+#include "creds.h"
 
 #include <mysql/mysql.h>
 
+using namespace std;
+
 void finish_with_error(MYSQL *con, string s){
-    cerr << "Error when " << s << " : " << mysql_error(con);
+    cerr << "Error when " << s << " : " << mysql_error(con) << endl;
     mysql_close(con);
     exit(1); 
 }
 
 int main(int argc ,char ** argv){
     MYSQL *con;
-    string rname;
+    MYSQL_ROW row;
+    MYSQL_RES * result;
+    string rurl, rid,q;
     for (int i = 0 ; i < argc; i++){
         if (strcmp(argv[i], "-n") == 0){
             rurl = argv[i+1];
         }
     }
 
-    if ((con = mysql_init(NULL) == NULL)){
+    if ((con = mysql_init(NULL)) == NULL){
         finish_with_error(con, "setting up MYSQL handler");
     }
 
     if (mysql_real_connect(con, IP_ADDR, UID, PWD, DBNAME, PORT, NULL, 0) == NULL){
         finish_with_error(con, "connecting to database");
     }
-    // get the repo and repo id first
-    q = "SELECT R.rname R.url FROM repo WHERE rurl=" + rurl;
+    
+    // get the repo name, url and wiki url first
+    q = "SELECT DISTINCT R.rname, R.rurl, WIKI.wurl, R.rid FROM repo R, wiki WIKI WHERE R.rurl='"+rurl+"' and WIKI.repoid = R.rid;";
     if (mysql_query(con, q.c_str()) != 0){
-        finish_with_error(con, "getting repo id from "
+        finish_with_error(con, "querying the database");
     }
-    // get the users who work in the repo
-    // get the tags that is in the repo
-    // match the tags to the users
+
+    result = mysql_store_result(con);
+    if (result == NULL){
+        finish_with_error(con, "storing result from query");
+    }
+    row = mysql_fetch_row(result);
+    cout << "----------REPOSITORY SUMMARY----------"<< endl;
+    cout << "Repository Name : " << row[0] << endl;
+    cout << "Repository URL : " << row[1] << endl;
+    cout << "Wiki URL : " << row[2] << endl;
+    rid = row[3];
+    mysql_free_result(result);
+    cout << endl; 
+    
+    // get contributors
+    q = "SELECT DISTINCT U.uname FROM users U, works_in W where W.rid=" + rid + " and W.uname = U.uname;";
+    mysql_query(con, q.c_str());
+    cout << "----------CONTRIBUTORS----------" << endl;
+    result = mysql_store_result(con);
+    while (row=mysql_fetch_row(result)){
+        cout << row[0] << endl;        
+    }
+    mysql_free_result(result);
+    
+    // get tags
+    cout << endl;
+    q = "SELECT DISTINCT T.tname FROM repo R, tags T, contained_tags CT where CT.rid="+rid+" and CT.tid=T.tid";
+    cout << "----------TAGS----------" << endl;
+    mysql_query(con, q.c_str());
+    result = mysql_store_result(con);
+    while (row=mysql_fetch_row(result)){
+        cout << row[0] << endl;
+    }
+    mysql_free_result(result);
+    mysql_close(con);
+    cout << endl;
+    
+    return 0;
 }
