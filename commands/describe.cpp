@@ -37,10 +37,10 @@ int main(int argc ,char ** argv){
     if (mysql_real_connect(con, IP_ADDR, UID, PWD, DBNAME, PORT, NULL, 0) == NULL){
         finish_with_error(con, "connecting to database");
     }
-
+    cout << "Uname" << uname << endl;
     // Security check, see whether the user can access to the repository first
     q = "SELECT DISTINCT U.uname FROM users U, works_in WI, repo R WHERE R.rurl='"+rurl+"' and U.uname='"+uname+"' and U.uname=WI.uname and WI.rid=R.rid";
-
+    
     if (mysql_query(con, q.c_str()) != 0){
         finish_with_error(con, "querying the database");
     }
