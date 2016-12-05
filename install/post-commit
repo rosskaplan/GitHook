@@ -3,10 +3,11 @@
 # get the message and get the file                
 msg=$(git log --pretty=oneline -1)
 files=$(git log --pretty="format:" --name-only -1)
+repo_url=$(git remote get-url origin)
 hasher=$(msg::)
 # call database to populate the database
 g++ ./scripts/callDatabase.cpp -o ./scripts/callDatabase
-./scripts/callDatabase -e "$GIT_AUTHOR_EMAIL" -n "$GIT_AUTHOR_NAME" -d "$GIT_AUTHOR_DATE" -m "$msg" -f "$files"
+./scripts/callDatabase -e "$GIT_AUTHOR_EMAIL" -n "$GIT_AUTHOR_NAME" -d "$GIT_AUTHOR_DATE" -m "$msg" -f "$files" -r "$repo_url"
 
 # put the commit on wiki by hash 
 cd wiki

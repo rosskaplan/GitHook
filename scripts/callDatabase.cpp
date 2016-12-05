@@ -1,3 +1,8 @@
+// Name : Brenda So, Ross Kaplan
+// Last Updated : 12/5/2016
+// Updates : 12/5/2016 -- Brenda So   -- Made function to write a line to wiki page
+// Updates : 12/4/2016 -- Ross Kaplan -- Made function to check whether user is in database
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -22,12 +27,28 @@ void finish_with_error(MYSQL *con, int n);
 #define PORT 3306
 #define DBNAME "githook"
 
+MYSQL *handler;
+MYSQL *mysql;
+string rurl;
+
 int main(int argc, char** argv) {
 
     string email, name, date, hash, temp, message;
     vector<string> files, tags;
     int count = 0;
     string tagtemp;
+
+    // Initializing MYSQL handler, which would be useful when initializing connection
+    // with server
+    if ((mysql = mysql_init(NULL)) == NULL){
+        finish_with_error(mysql,1);
+        return 0;
+    }
+    // Connecting to the database
+    if (mysql_real_connect(mysql, IP_ADDR, UID, PWD, DBNAME ,PORT,NULL,0) == NULL){
+        finish_with_error(mysql,2);
+        return 0;
+    }
 
     for (int i = 0; i < argc; i++) {
         if (strcmp(argv[i], "-e") == 0) {
@@ -45,6 +66,9 @@ int main(int argc, char** argv) {
         }
         if (strcmp(argv[i], "-d") == 0) {
             date = argv[i+1];
+        }
+        if (strcmp(argv[i],"-r") == 0){
+            rurl = argv[i+1];
         }
         if (strcmp(argv[i], "-m") == 0) {
             //temp = argv[i+1];
@@ -110,14 +134,13 @@ int main(int argc, char** argv) {
     string command;
     for (int i = 0; i < tags.size(); ++i) {
         cout << "tag: " << tags[i] << endl;
+        void insertPage(tags[i]);
+
         // see whether tag exist in the db
         // if there isn't a tag, we have to add to database (contained_tags and page)
-        if (!ifstream("./Wiki/"+tags[i]+".md")){
-            // file does not exist
-            // check whether tag exist
-            // if tag does not exist, add it to database
-            
-        }
+
+        // This part only concerns the wiki
+
     }
 
     //Time to insert all information into database as necessary
@@ -127,27 +150,60 @@ int main(int argc, char** argv) {
         exit(-1);
     }
 
+    mysql_close(mysql);
+
     return 0;
 
 }
 
+// This function attemps to insert a page into the database into the database. If a page is successfully inserted, We need to add a page to the Wiki
+bool insertPage(string tag){
+    string q;
+    // see whether a repo contains the tag yet
+    q = "SELECT DISTINCT T.tname FROM repo R, tags T, contained_tags CT where CT.rid=R.rid and R.rurl='"+rurl+"' and CT.tid=T.tid and T.tname='"+tag+"';";
+    if (mysql_query(mysql,q.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+    MYSQL_RES * result = mysql_store_result(mysql);
+    if (result == NULL){
+       finish_with_error(mysql,4);
+       return 0;
+    }
+    int num_rows = mysql_num_rows(result);
+    mysql_free_result(result);
+    if (num_rows == 0){
+        // see whether there is a tag is in DB
+        q = "SELECT DISTINCT T.tname from tags T where T.tname='"+tags+"';";
+        if (mysql_query(mysql,q.c_str())){
+            finish_with_error(mysql, 3);
+            return 0;
+        }
+        result = mysql_store_result(mysql);
+        if (result == NULL){
+            finish_with_error(mysql,4);
+            return 0;
+        }
+        int num_rows2=mysql_num_rows(result);
+        mysql_free_result(result);
+        if (num_rows2 == 0){
+            q = "INSERT INTO tags VALUES(NULL,'"+tag+"');";
+            if (mysql_query(mysql, q.c_str())){
+                finish_with_error(mysql,3);
+                return 0;
+            }
+        }
+
+        // get the tid and insert into contained_tags;
+        // insert into page;
+
+    }
+    return 0;
+}
+
+
+// This function attempts to insert user into the database
 bool insertUser(string username) {
-
-    MYSQL *handler;
-    MYSQL *mysql;
-
-    // Initializing MYSQL handler, which would be useful when initializing connection
-    // with server
-    if ((mysql = mysql_init(NULL)) == NULL){
-        finish_with_error(mysql,1);
-        return 0;
-    }
-
-    // Connecting to the database
-    if (mysql_real_connect(mysql, IP_ADDR, UID, PWD, DBNAME ,PORT,NULL,0) == NULL){
-        finish_with_error(mysql,2);
-        return 0;
-    }
 
     // Execute a query in the database
     if (mysql_query(mysql, "SELECT * FROM users;")){
@@ -188,8 +244,6 @@ bool insertUser(string username) {
     
     // Free the memory that stores the result
     mysql_free_result(result);
-    // Close connection with databse
-    mysql_close(mysql);
 
     return 1;
 }
