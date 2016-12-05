@@ -111,7 +111,13 @@ int main(int argc, char** argv) {
     for (int i = 0; i < tags.size(); ++i) {
         cout << "tag: " << tags[i] << endl;
         // see whether tag exist in the db
-        // system(command.c_str());
+        // if there isn't a tag, we have to add to database (contained_tags and page)
+        if (!ifstream("./Wiki/"+tags[i]+".md")){
+            // file does not exist
+            // check whether tag exist
+            // if tag does not exist, add it to database
+            
+        }
     }
 
     //Time to insert all information into database as necessary
@@ -189,7 +195,7 @@ bool insertUser(string username) {
 }
 
 // This function takes in a tag and makes a new page
-/*void docuwrite(string tag, string hash, string name, string message, string date, ofstream outfile){
+void docuwrite(string tag, string hash, string name, string message, string date, ofstream outfile){
     
     outfile << "## " << tag << endl;
     outfile << endl;
@@ -205,9 +211,6 @@ bool insertUser(string username) {
     outfile << endl;
     outfile.close();
 }
-
-
-*/
 
 void finish_with_error(MYSQL *con, int n){
     fprintf(stderr,"ERROR! %d %s\n", n, mysql_error(con));
