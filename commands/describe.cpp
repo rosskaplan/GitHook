@@ -26,7 +26,10 @@ int main(int argc ,char ** argv){
         if (strcmp(argv[i], "-n") == 0){
             rurl = argv[i+1];
         }else if (strcmp(argv[i], "-u") == 0){
-            uname = argv[i+1];
+            if (strcmp(argv[i+1], "") == 0){
+                cout << "Please enter your username : ";
+                cin >> uname;
+            }
         }
     }
 
@@ -37,7 +40,6 @@ int main(int argc ,char ** argv){
     if (mysql_real_connect(con, IP_ADDR, UID, PWD, DBNAME, PORT, NULL, 0) == NULL){
         finish_with_error(con, "connecting to database");
     }
-    cout << "Uname" << uname << endl;
     // Security check, see whether the user can access to the repository first
     q = "SELECT DISTINCT U.uname FROM users U, works_in WI, repo R WHERE R.rurl='"+rurl+"' and U.uname='"+uname+"' and U.uname=WI.uname and WI.rid=R.rid";
     

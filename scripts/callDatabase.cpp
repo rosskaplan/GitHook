@@ -30,6 +30,7 @@ void finish_with_error(MYSQL *con, int n);
 MYSQL *handler;
 MYSQL *mysql;
 string rurl;
+string rid;
 
 int main(int argc, char** argv) {
 
@@ -134,7 +135,7 @@ int main(int argc, char** argv) {
     string command;
     for (int i = 0; i < tags.size(); ++i) {
         cout << "tag: " << tags[i] << endl;
-        void insertPage(tags[i]);
+        insertPage(tags[i]);
 
         // see whether tag exist in the db
         // if there isn't a tag, we have to add to database (contained_tags and page)
@@ -172,6 +173,7 @@ bool insertPage(string tag){
     }
     int num_rows = mysql_num_rows(result);
     mysql_free_result(result);
+    string tid;
     if (num_rows == 0){
         // see whether there is a tag is in DB
         q = "SELECT DISTINCT T.tname from tags T where T.tname='"+tags+"';";
@@ -193,7 +195,18 @@ bool insertPage(string tag){
                 return 0;
             }
         }
-
+        q = "SELECT T.tid FROM tags WHERE tname='"+tag+"';";
+        if (mysql_query(mysql, q.c_str())){
+            finish_with_error(mysql,3);
+            return 0;
+        }
+        result = mysql_store_result(mysql);
+        if (result == NULL){
+            finish_with_error(mysql, 4);
+            return 0;
+        }
+        tid = mysql_fetch_row(result)[0];
+        q = "INSERT INTO "
         // get the tid and insert into contained_tags;
         // insert into page;
 
