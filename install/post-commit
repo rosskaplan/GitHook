@@ -5,6 +5,15 @@ msg=$(git log --pretty=oneline -1)
 files=$(git log --pretty="format:" --name-only -1)
 branch=$(git show-branch)
 repo_url=$(git remote get-url origin)
+
 # call database to populate the database
 g++ --std=c++11 ./scripts/callDatabase.cpp -o ./scripts/callDatabase -lmysqlclient
+<<<<<<< HEAD
 ./scripts/callDatabase -e "$GIT_AUTHOR_EMAIL" -n "$GIT_AUTHOR_NAME" -b "$branch" -r "$repo_url" -m "$msg" -f "$files"
+
+# cd wiki
+# git pull origin master
+# git add *
+# git commit -m "committing"
+# git push origin master
+# cd ..
