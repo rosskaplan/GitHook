@@ -19,8 +19,10 @@
 using namespace std;
 
 bool insertUser(string username);
+int insertWikiURL(string repo_url);
+int insertWorksIn(string username, string repo_url);
 void finish_with_error(MYSQL *con, int n);
-
+//tags -> contained_tags -> files -> commits -> tagged_changes
 #define IP_ADDR "199.98.20.115"
 #define UID "gordon"
 #define PWD "gordon2"
@@ -29,6 +31,7 @@ void finish_with_error(MYSQL *con, int n);
 
 MYSQL *handler;
 MYSQL *mysql;
+MYSQL *mysql_temp;
 string rurl;
 string rid;
 
@@ -38,18 +41,6 @@ int main(int argc, char** argv) {
     vector<string> files, tags;
     int count = 0;
     string tagtemp;
-
-    // Initializing MYSQL handler, which would be useful when initializing connection
-    // with server
-    if ((mysql = mysql_init(NULL)) == NULL){
-        finish_with_error(mysql,1);
-        return 0;
-    }
-    // Connecting to the database
-    if (mysql_real_connect(mysql, IP_ADDR, UID, PWD, DBNAME ,PORT,NULL,0) == NULL){
-        finish_with_error(mysql,2);
-        return 0;
-    }
 
     for (int i = 0; i < argc; i++) {
         if (strcmp(argv[i], "-e") == 0) {
@@ -81,11 +72,8 @@ int main(int argc, char** argv) {
             }
             temp.pop_back(); //removes trailing space
 
-            cout << "temp: \"" << temp << "\" " << endl;
             hash = temp.substr(0, 40);
-            cout << "temp: \"" << temp << "\" " << endl;
             temp = temp.substr(41, temp.length()-41);
-            cout << "temp: \"" << temp << "\" " << endl;
             for (int j = 0; j < temp.length(); j++) {
                 if (temp[j] == '*')
                     ++count;
@@ -123,6 +111,7 @@ int main(int argc, char** argv) {
     cout << "name: " << name << endl;
     cout << "date: " << date << endl;
     cout << "hash: " << hash << endl;
+    cout << "repo_url: " << rurl << endl;
     cout << "message: " << message << endl;
     string wiki_msg;
     // Concantenate all the information to form an entry in the wiki
@@ -133,7 +122,7 @@ int main(int argc, char** argv) {
     }
     wiki_msg += ": "+ message;
     string command;
-    for (int i = 0; i < tags.size(); ++i) {
+    /*for (int i = 0; i < tags.size(); ++i) {
         cout << "tag: " << tags[i] << endl;
         insertPage(tags[i]);
 
@@ -142,12 +131,38 @@ int main(int argc, char** argv) {
 
         // This part only concerns the wiki
 
+    } */
+    //
+    // Initializing MYSQL handler, which would be useful when initializing connection
+    // with server
+    if ((mysql = mysql_init(NULL)) == NULL){
+        finish_with_error(mysql,1);
+        return 1;
+    }
+    // Connecting to the database
+    if (mysql_real_connect(mysql, IP_ADDR, UID, PWD, DBNAME ,PORT,NULL,0) == NULL){
+        finish_with_error(mysql,2);
+        return 1;
     }
 
-    //Time to insert all information into database as necessary
+    //Error handling for wiki insertions
+    int tempint = insertWikiURL(rurl);
+    if (tempint == 2) {
+        cerr << "User has not run installer script." << endl;
+        exit(-1);
+    } else if (tempint == 0) {
+        cerr << "Failed to add repo url to database." << endl;
+        exit(-1);
+    }
 
+    //Error handling for user insertion
     if (!insertUser(name)) {
         cerr << "Failed to add user to database." << endl;
+        exit(-1);
+    }
+
+    if (!insertWorksIn(name, rurl)) {
+        cerr << "Failed to add a user to a repo." << endl;
         exit(-1);
     }
 
@@ -158,7 +173,158 @@ int main(int argc, char** argv) {
 }
 
 // This function attemps to insert a page into the database into the database. If a page is successfully inserted, We need to add a page to the Wiki
-bool insertPage(string tag){
+int insertWorksIn(string username, string repo_url) {
+    // Execute a query in the database
+    string temp = "SELECT works_in.rid, works_in.uname FROM works_in, repo WHERE repo.rurl='"+repo_url+"'AND works_in.rid=repo.rid AND works_in.uname='"+username+"';";
+    if (mysql_query(mysql, temp.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+
+    // Store the result of the query
+    MYSQL_RES * result = mysql_store_result(mysql);
+    if (result == NULL){
+        finish_with_error(mysql, 4);
+        return 0;
+    }
+
+    int num_fields = mysql_num_fields(result);
+    // Show the result of the query
+    MYSQL_ROW row;
+    row = mysql_fetch_row(result);
+    if (row) {
+        return 1;
+    } else {
+        temp = "SELECT rid FROM repo WHERE repo.rurl='"+repo_url+"';";
+        if (mysql_query(mysql, temp.c_str())){
+            finish_with_error(mysql,3);
+            return 0;
+        }
+
+        // Store the result of the query
+        MYSQL_RES * result = mysql_store_result(mysql);
+        if (result == NULL){
+            finish_with_error(mysql, 4);
+            return 0;
+        }
+        row = mysql_fetch_row(result);
+        if (result) {
+            temp = "INSERT INTO works_in (uname, rid) VALUES ('"+username+"', '"+(string)row[0]+"');";
+            if (mysql_query(mysql, temp.c_str())){
+                finish_with_error(mysql,3);
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+            
+    }
+    // Free the memory that stores the result
+    mysql_free_result(result);
+
+    return 1;
+}
+
+// This function attemps to insert a page into the database into the database. If a page is successfully inserted, We need to add a page to the Wiki
+int insertWikiURL(string repo_url){
+    // Execute a query in the database
+    string temp = "SELECT rid FROM repo WHERE repo.rurl='"+repo_url+"';";
+    if (mysql_query(mysql, temp.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+
+    // Store the result of the query
+    MYSQL_RES * result = mysql_store_result(mysql);
+    if (result == NULL){
+        finish_with_error(mysql, 4);
+        return 0;
+    }
+
+    int num_fields = mysql_num_fields(result);
+    // Show the result of the query
+    MYSQL_ROW row;
+    row = mysql_fetch_row(result);
+    string repoid_result = (string)row[0];
+    if (row[0]) {
+        ///*+(string)row[0]*/
+        
+        temp = "SELECT repoid FROM wiki WHERE wiki.repoid='"+repoid_result+"';";
+        if (mysql_query(mysql, temp.c_str())){
+            finish_with_error(mysql,3);
+            return 0;
+        }
+
+        MYSQL_RES * result = mysql_store_result(mysql);
+        if (result == NULL){
+            finish_with_error(mysql, 4);
+            return 0;
+        }
+        row = mysql_fetch_row(result);
+        if (row) {
+        } else {
+            string wurl = repo_url.erase(repo_url.length()-3)+"wiki.git";
+            temp = "INSERT INTO wiki (repoid, wurl) VALUES ('"+repoid_result+"', '"+wurl+"');";
+            if (mysql_query(mysql, temp.c_str())){
+                finish_with_error(mysql,3);
+                return 0;
+            }
+        }
+    } else {
+        return 2;
+    }
+// Free the memory that stores the result
+    mysql_free_result(result);
+
+    return 1;
+}
+
+// This function attempts to insert user into the database
+bool insertUser(string username) {
+
+    // Execute a query in the database
+    if (mysql_query(mysql, "SELECT * FROM users;")){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+
+    // Store the result of the query
+    MYSQL_RES * result = mysql_store_result(mysql);
+    if (result == NULL){
+        finish_with_error(mysql, 4);
+        return 0;
+    }
+
+    int num_fields = mysql_num_fields(result);
+    // Show the result of the query
+    MYSQL_ROW row;
+    while ((row=mysql_fetch_row(result))){
+        for (int i = 0 ; i < num_fields; i++){
+            if (((string)row[i]).compare(username) == 0) {
+                //Success: user already in database
+                return 1;
+            }
+        }
+    }
+    char buffer[200];
+    int length = sprintf(buffer, "INSERT INTO users (uname) VALUES ('%s');", username.c_str());
+    buffer[length] = '\0';
+    if (mysql_query(mysql, buffer)){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+    
+    num_fields = mysql_num_fields(result);
+    // Show the result of the query
+    
+    // Free the memory that stores the result
+    mysql_free_result(result);
+
+    return 1;
+}
+
+// This function attemps to insert a page into the database into the database. If a page is successfully inserted, We need to add a page to the Wiki
+/*bool insertPage(string tag){
     string q;
     // see whether a repo contains the tag yet
     q = "SELECT DISTINCT T.tname FROM repo R, tags T, contained_tags CT where CT.rid=R.rid and R.rurl='"+rurl+"' and CT.tid=T.tid and T.tname='"+tag+"';";
@@ -212,54 +378,7 @@ bool insertPage(string tag){
 
     }
     return 0;
-}
-
-
-// This function attempts to insert user into the database
-bool insertUser(string username) {
-
-    // Execute a query in the database
-    if (mysql_query(mysql, "SELECT * FROM users;")){
-        finish_with_error(mysql,3);
-        return 0;
-    }
-
-    // Store the result of the query
-    MYSQL_RES * result = mysql_store_result(mysql);
-    if (result == NULL){
-        finish_with_error(mysql, 4);
-        return 0;
-    }
-
-    int num_fields = mysql_num_fields(result);
-    // Show the result of the query
-    MYSQL_ROW row;
-    while ((row=mysql_fetch_row(result))){
-        for (int i = 0 ; i < num_fields; i++){
-            if (((string)row[i]).compare(username) == 0) {
-                //Success: user already in database
-                mysql_free_result(result);
-                mysql_close(mysql);
-                return 1;
-            }
-        }
-    }
-    char buffer[200];
-    int length = sprintf(buffer, "INSERT INTO users (uname) VALUES ('%s');", username.c_str());
-    buffer[length] = '\0';
-    if (mysql_query(mysql, buffer)){
-        finish_with_error(mysql,3);
-        return 0;
-    }
-    
-    num_fields = mysql_num_fields(result);
-    // Show the result of the query
-    
-    // Free the memory that stores the result
-    mysql_free_result(result);
-
-    return 1;
-}
+} */
 
 // This function takes in a tag and makes a new page
 void docuwrite(string tag, string hash, string name, string message, string date, ofstream outfile){
