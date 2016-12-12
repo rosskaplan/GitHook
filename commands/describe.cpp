@@ -4,17 +4,12 @@
 
 #include <iostream>
 #include <string.h>
+#include <string>
 #include "creds.h"
-
+#include "utils.h"
 #include <mysql/mysql.h>
 
 using namespace std;
-
-void finish_with_error(MYSQL *con, string s){
-    cerr << "Error when " << s << " : " << mysql_error(con) << endl;
-    mysql_close(con);
-    exit(1); 
-}
 
 int main(int argc ,char ** argv){
     MYSQL *con;
@@ -29,6 +24,8 @@ int main(int argc ,char ** argv){
             if (strcmp(argv[i+1], "") == 0){
                 cout << "Please enter your username : ";
                 cin >> uname;
+            }else{
+                uname = argv[i+1];
             }
         }
     }
@@ -41,25 +38,17 @@ int main(int argc ,char ** argv){
         finish_with_error(con, "connecting to database");
     }
     // Security check, see whether the user can access to the repository first
-    q = "SELECT DISTINCT U.uname FROM users U, works_in WI, repo R WHERE R.rurl='"+rurl+"' and U.uname='"+uname+"' and U.uname=WI.uname and WI.rid=R.rid";
-    
-    if (mysql_query(con, q.c_str()) != 0){
-        finish_with_error(con, "querying the database");
-    }
-    result = mysql_store_result(con);
-    while(result == NULL){
-        finish_with_error(con, "storing result from query");
-    }
-    access = mysql_num_rows(result);
-
-    if (!access){
-        cout << "You do not work in this repo -- you do not have access to " << rurl << endl;
+    rid = hasAccess(con, uname, rurl);
+    if (((string)rid).compare("") == 0) {
+        cerr << "You do not work in this repo -- you do not have access to " << rurl << endl;
+        mysql_free_result(result);
+        mysql_close(con);
         exit(1);
     }
     mysql_free_result(result);
     
     // get the repo name, url and wiki url first
-    q = "SELECT DISTINCT R.rname, R.rurl, WIKI.wurl, R.rid FROM repo R, wiki WIKI WHERE R.rurl='"+rurl+"' and WIKI.repoid = R.rid;";
+    q = "SELECT DISTINCT R.rname, R.rurl, WIKI.wurl, R.rid FROM repo R, wiki WIKI WHERE R.rid="+rid+" and WIKI.repoid = R.rid;";
     if (mysql_query(con, q.c_str()) != 0){
         finish_with_error(con, "querying the database");
     }

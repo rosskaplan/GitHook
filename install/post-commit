@@ -11,13 +11,10 @@ g++ ./scripts/callDatabase.cpp -o ./scripts/callDatabase
 
 
 cd wiki
-git wiki pull origin master
+git pull origin master
 
 git add
 git commit -m "committing"
 git push origin master
 
-cd ..
-
-# run a program that queries the database and update the affected pages
-# need to ask sable how to do this part                                         
+cd ..                                       

@@ -1,0 +1,5 @@
+#!/bin/sh
+repo_link="$(git remote get-url origin)"
+
+g++ exportwiki.cpp utils.cpp utils.h -o exportwiki -lmysqlclient
+./exportwiki -n "$repo_link" -u "$GIT_AUTHOR_NAME"    # note to self: prompt user to enter username if GIT author name is not set
