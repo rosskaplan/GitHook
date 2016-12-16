@@ -1,86 +1,82 @@
+// Name : Brenda So
+// Date : 12/16/2016
+// Objective : To insert stuff into wiki after all the information is inserted int odatabse
+// NOTE : pull first before doing this step
+// NOTE : after this step we need to push
+// sample line : [hash] brendabrandy made changes to file1, file2, file3 (with links) on (date, time): [commit msg]
+// test case: hash = 0f3fc14f9d281d29e3837771bb9047e720b84bb6 
 #include <iostream>
-#include <cstdlib>
-#include <string>
-#include <vector>
-#include <cstdio>
-#include <cstring>
+#include "utils.h"
+#include "creds.h"
+#include <mysql/mysql.h>
 using namespace std;
 
-int main(int argc, char** argv) {
+MYSQL *mysql;
 
-    string email, name, date, hash, temp, message;
-    vector<string> files, tags;
-    int count = 0;
-    string tagtemp;
-    for (int i = 0; i < argc; i++) {
-        if (strcmp(argv[i], "-e") == 0) {
-            email = argv[i+1];
-        }
-        if (strcmp(argv[i], "-n") == 0) {
-            name = argv[i+1];
-        }
-        if (strcmp(argv[i], "-d") == 0) {
-            date = argv[i+1];
-        }
-        if (strcmp(argv[i], "-m") == 0) {
-            temp = argv[i+1];
-            hash = temp.substr(0, 40);
-            temp = temp.substr(41, temp.length()-41);
-            for (int j = 0; j < temp.length(); j++) {
-                if (temp[j] == '*')
-                    ++count;
-            }
-            if (count % 2 == 1) {
-                cout << "There are an odd number of stars.  This commit will not be added to the wiki." << endl;
-                return 1;
-            }
-            count = 0;
-            for (int j = 0; j < temp.length(); j++) {
-                if (temp[j] == '*') {
-                    count++;
-                    if (count % 2 == 1)
-                        tagtemp.clear();
-                    else if (!tagtemp.empty()) {
-                        tags.push_back(tagtemp);
-                        tagtemp.clear();
-                    }
-                } else {
-                    tagtemp+=temp[j];
-                }
-            }
-            message = tagtemp;
-        }
-        if (strcmp(argv[i], "-f") == 0) {
-            i++;
-            while(argv[i]) {
-                files.push_back(argv[i++]);
-            }
-        }
+sting formatLine(result){
+    // obtain filen
+}
+
+int main(int argc, char ** argv){
+    string hasher, q, commit_line;
+    hasher = argv[1];
+    MYSQL_ROW row;
+    MYSQL_RES * result;
+    int num_fields;
+    if ((mysql = mysql_init(NULL)) == NULL){
+        finish_with_error(mysql, "Initializing mysql connection" );
+        return 1;
     }
 
-    cout << "email: " << email << endl;
-    cout << "name: " << name << endl;
-    cout << "date: " << date << endl;
-    cout << "hash: " << hash << endl;
-    cout << "message: " << message << endl;
-    string wiki_msg;
-    // Concantenate all the information to form an entry in the wiki
-    wiki_msg =  date + "\t" + name + " changed ";
-    for (int i = 0 ; i < files.size(); ++i){
-        cout << "file: " << files[i] << endl;
-        wiki_msg += files[i] + " ";
+    if (mysql_real_connect(mysql, IP_ADDR, UID, PWD, DBNAME, PORT, NULL, 0) == NULL){
+        finish_with_error(mysql, "Establishing connection");
+        return 1;
     }
-    wiki_msg += ": "+ message;
-    string command;
-    for (int i = 0; i < tags.size(); ++i) {
-        cout << "tag: " << tags[i] << endl;
-        command = "bash ./changeWiki.sh -t " + tags[i] + " -m " + wiki_msg;
-        // Now for each tag, if the file already exist, then just append it to the sentence
-        // else run another script where the file would be created, and the the sentence
-        // would be appended
-        // TODO: This could get complicated, but let's finish the base case first
-        system(command.c_str());
+    q = "SELECT C.cmsg, C.cdatetime, C.uname, F.furl FROM commits C, file F WHERE C.hash='"+hasher+"' and C.fid=F.fid;";
+    // query the database and get all the commits you need, assuming an input argument is given
+    if (mysql_query(mysql, q.c_str()) != 0){
+        finish_with_error(mysql, "querying the database");
+        return 1;
+    }
+    
+    if ((result=mysql_store_result(mysql)) == NULL){
+        finish_with_error(mysql, "storing result from database");
+    }
+    // format the commit into a string;
+    commit_line = formatLine(result);
+    num_fields = mysql_num_fields(result);
+    while (row=mysql_fetch_row(result)){
+        for (int i = 0 ; i < num_fields; i++){
+            printf("%s ", row[i] ? row[i] : "NULL");
+        }
+        cout << endl;
+    }
+    mysql_free_result(result);
+    q = "SELECT T.tname from tagged_changes C, tags T WHERE C.hash='"+hasher+"' and T.tid=C.tid;";
+    if (mysql_query(mysql, q.c_str()) != 0){
+        finish_with_error(mysql, "querying the database");
+        return 1;
     }
 
-    return 0;
+    if ((result=mysql_store_result(mysql)) == NULL){
+        finish_with_error(mysql, "storing result from database");
+    }
+
+    num_fields = mysql_num_fields(result);
+    while (row=mysql_fetch_row(result)){
+        for (int i = 0 ; i < num_fields; i++){
+            printf("%s ", row[i] ? row[i] : "NULL");
+        }
+        cout << endl;
+    }
+    
+    // first check whether the page exist or not
+    // if it doesn't exist locally, check whether it exist on the server
+    // if it exist on the server, it means that git pull is not successful/
+    // complete, so exit and ask the user to git pull manually
+    // if it doesn't exist on the server, create a new page and name it
+    // with the tag
+    // file I/O to insert the message
+    // do this for all the tags
+    // and then exit, after we exit, we need to git pull/push the stuff now
 }
