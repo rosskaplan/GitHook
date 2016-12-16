@@ -25,7 +25,7 @@ int insertWorksIn(string username, string repo_url);
 int insertTag(string tag);
 int insertContainedTag(string tag, string repo_url);
 int insertFiles(string file, string repo_url, string branch);
-int insertTaggedChanges(string file, string repo_url, string branch);
+int insertTaggedChanges(string file, string hash);
 int insertCommit(string message, string hash, string username, string file, string repo_url, string branch);
 void finish_with_error(MYSQL *con, int n);
 
@@ -190,11 +190,9 @@ int main(int argc, char** argv) {
             cerr << "Failed to add a tag to contained tags." << endl;
             exit(-1);
         }
-        for (int j = 0; j < files.size(); j++) {
-            if (!insertTaggedChanges(tags[i], files[i])) {
-                cerr << "Failed to add a tag to tagged changes." << endl;
-                exit(-1);
-            }
+        if (!insertTaggedChanges(tags[i], hash)) {
+            cerr << "Failed to add a tag to tagged changes." << endl;
+            exit(-1);
         }
     }
     for (int i = 0; i < files.size(); i++) {
@@ -297,6 +295,37 @@ int insertTag(string tag) {
     return 1;
 }
 
+int insertTaggedChanges(string tag, string hash) {
+
+    string temp = "SELECT tags.tid FROM tags WHERE tags.tname='"+tag+"';";
+    if (mysql_query(mysql, temp.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+    // Store the result of the query
+    MYSQL_RES * result = mysql_store_result(mysql);
+    if (result == NULL){
+        finish_with_error(mysql, 4);
+        return 0;
+    }
+
+    int num_fields = mysql_num_fields(result);
+    // Show the result of the query
+    MYSQL_ROW row;
+    row = mysql_fetch_row(result);
+    if (!row) {
+        return 0;
+    }
+    temp = "INSERT INTO tagged_changes VALUES ('"+(string)row[0]+"','"+hash+"');";
+    if (mysql_query(mysql, temp.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+
+    // Free the memory that stores the result
+    mysql_free_result(result);
+    return 1;
+}
 int insertCommit(string message, string hash, string username, string file, string repo_url, string branch) {
 
     string temp = "SELECT rid FROM repo WHERE repo.rurl='"+repo_url+"';";
