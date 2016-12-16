@@ -12,6 +12,7 @@
 #include <cstring>
 #include <errno.h>
 #include <string.h>
+#include <ctime>
 #include <time.h>
 
 #include <mysql/mysql.h>
@@ -21,8 +22,13 @@ using namespace std;
 bool insertUser(string username);
 int insertWikiURL(string repo_url);
 int insertWorksIn(string username, string repo_url);
+int insertTag(string tag);
+int insertContainedTag(string tag, string repo_url);
+int insertFiles(string file, string repo_url, string branch);
+int insertTaggedChanges(string file, string repo_url, string branch);
+int insertCommit(string message, string hash, string username, string file, string repo_url, string branch);
 void finish_with_error(MYSQL *con, int n);
-//tags -> contained_tags -> files -> commits -> tagged_changes
+
 #define IP_ADDR "199.98.20.115"
 #define UID "gordon"
 #define PWD "gordon2"
@@ -37,7 +43,7 @@ string rid;
 
 int main(int argc, char** argv) {
 
-    string email, name, date, hash, temp, message;
+    string email, name, hash, temp, message, branch;
     vector<string> files, tags;
     int count = 0;
     string tagtemp;
@@ -49,15 +55,18 @@ int main(int argc, char** argv) {
         if (strcmp(argv[i], "-n") == 0) {
             //name = argv[i+1];
             ++i;
-            while (strcmp(argv[i], "-d") != 0) { //while not equal
+            while (strcmp(argv[i], "-b") != 0) { //while not equal
                 name += argv[i];
                 name+= " ";
                 ++i;
             }
             name.pop_back(); //removes trailing space
         }
-        if (strcmp(argv[i], "-d") == 0) {
-            date = argv[i+1];
+        if (strcmp(argv[i], "-b") == 0) {
+            branch = argv[i+1];
+            int openbracket = branch.find("[");
+            int closebracket = branch.find("]");
+            branch = branch.substr(openbracket+1, closebracket-openbracket-1);
         }
         if (strcmp(argv[i],"-r") == 0){
             rurl = argv[i+1];
@@ -99,40 +108,46 @@ int main(int argc, char** argv) {
             message = tagtemp;
             message.erase(0,1);
         }
+        int fileloc;
+        string filetemp;
+        string othertemp;
         if (strcmp(argv[i], "-f") == 0) {
             i++;
             while(argv[i]) {
-                files.push_back(argv[i++]);
+                filetemp = argv[i++];
+                while (filetemp.find("\n") != std::string::npos) {
+                    fileloc = filetemp.find("\n");
+                    othertemp = filetemp.substr(0, fileloc);
+                    filetemp = filetemp.substr(fileloc+1, filetemp.length()-fileloc-1);
+                    files.push_back(othertemp);
+                }
+                files.push_back(filetemp);
             }
         }
     }
 
     cout << "email: " << email << endl;
     cout << "name: " << name << endl;
-    cout << "date: " << date << endl;
+    cout << "branch: " << branch << endl;
     cout << "hash: " << hash << endl;
     cout << "repo_url: " << rurl << endl;
     cout << "message: " << message << endl;
     string wiki_msg;
     // Concantenate all the information to form an entry in the wiki
-    wiki_msg =  date + "\t" + name + " changed ";
+    //wiki_msg =  date + "\t" + name + " changed ";
     for (int i = 0 ; i < files.size(); ++i){
         cout << "file: " << files[i] << endl;
         wiki_msg += files[i] + " ";
     }
     wiki_msg += ": "+ message;
     string command;
-    /*for (int i = 0; i < tags.size(); ++i) {
+    for (int i = 0; i < tags.size(); ++i) {
         cout << "tag: " << tags[i] << endl;
-        insertPage(tags[i]);
+        //insertPage(tags[i]);
 
-        // see whether tag exist in the db
-        // if there isn't a tag, we have to add to database (contained_tags and page)
 
-        // This part only concerns the wiki
+    }
 
-    } */
-    //
     // Initializing MYSQL handler, which would be useful when initializing connection
     // with server
     if ((mysql = mysql_init(NULL)) == NULL){
@@ -166,9 +181,243 @@ int main(int argc, char** argv) {
         exit(-1);
     }
 
+    for (int i = 0; i < tags.size(); ++i) {
+        if (!insertTag(tags[i])) {
+            cerr << "Failed to add a tag to your repo." << endl;
+            exit(-1);
+        }
+        if (!insertContainedTag(tags[i], rurl)) {
+            cerr << "Failed to add a tag to contained tags." << endl;
+            exit(-1);
+        }
+        for (int j = 0; j < files.size(); j++) {
+            if (!insertTaggedChanges(tags[i], files[i])) {
+                cerr << "Failed to add a tag to tagged changes." << endl;
+                exit(-1);
+            }
+        }
+    }
+    for (int i = 0; i < files.size(); i++) {
+        if (!insertFiles(files[i], rurl, branch)) {
+            cerr << "Failed to add a file to your repo." << endl;
+            exit(-1);
+        }
+        if (!insertCommit(message, hash, name, files[i], rurl, branch)) {
+            cerr << "Failed to add a commit to the database" << endl;
+            exit(-1);
+        }
+    }
+
     mysql_close(mysql);
 
     return 0;
+
+}
+
+int insertContainedTag(string tag, string repo_url) {
+
+    string temp = "SELECT tags.tid FROM tags WHERE tags.tname='"+tag+"';";
+    if (mysql_query(mysql, temp.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+    // Store the result of the query
+    MYSQL_RES * result = mysql_store_result(mysql);
+    if (result == NULL){
+        finish_with_error(mysql, 4);
+        return 0;
+    }
+
+    int num_fields = mysql_num_fields(result);
+    // Show the result of the query
+    MYSQL_ROW row;
+    row = mysql_fetch_row(result);
+    if (row) {
+        string temp_tid = (string)row[0];
+
+        temp = "SELECT rid FROM repo WHERE repo.rurl='"+repo_url+"';";
+        if (mysql_query(mysql, temp.c_str())){
+            finish_with_error(mysql,3);
+            return 0;
+        }
+
+        // Store the result of the query
+        MYSQL_RES * result = mysql_store_result(mysql);
+        if (result == NULL){
+            finish_with_error(mysql, 4);
+            return 0;
+        }
+        row = mysql_fetch_row(result);
+        if (row) {
+            temp = "INSERT INTO contained_tags VALUES ('"+temp_tid+"', '"+(string)row[0]+"');";
+            if (mysql_query(mysql, temp.c_str())){
+                finish_with_error(mysql,3);
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+    // Free the memory that stores the result
+    mysql_free_result(result);
+    return 1;
+}
+
+int insertTag(string tag) {
+
+    string temp = "SELECT tags.tname FROM tags WHERE tags.tname='"+tag+"';";
+    if (mysql_query(mysql, temp.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+    // Store the result of the query
+    MYSQL_RES * result = mysql_store_result(mysql);
+    if (result == NULL){
+        finish_with_error(mysql, 4);
+        return 0;
+    }
+
+    int num_fields = mysql_num_fields(result);
+    // Show the result of the query
+    MYSQL_ROW row;
+    row = mysql_fetch_row(result);
+    if (row) {
+        return 1;
+    } else {
+        temp = "INSERT INTO tags VALUES ('"+tag+"', NULL);";
+        if (mysql_query(mysql, temp.c_str())){
+            finish_with_error(mysql,3);
+            return 0;
+        }
+
+        // Store the result of the query
+    }
+    // Free the memory that stores the result
+    mysql_free_result(result);
+    return 1;
+}
+
+int insertCommit(string message, string hash, string username, string file, string repo_url, string branch) {
+
+    string temp = "SELECT rid FROM repo WHERE repo.rurl='"+repo_url+"';";
+    if (mysql_query(mysql, temp.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+
+    // Store the result of the query
+    MYSQL_RES * result = mysql_store_result(mysql);
+    if (result == NULL){
+        finish_with_error(mysql, 4);
+        return 0;
+    }
+    MYSQL_ROW row;
+    row = mysql_fetch_row(result);
+    if (!row) {
+        return 0;
+    }
+    string rid = (string)row[0];
+
+    string tempurl;
+    string git = ".git";
+    if (strcmp(repo_url.substr(repo_url.length()-4).c_str(), git.c_str()) == 0) {
+        tempurl = repo_url.substr(0, repo_url.length()-4)+"/blob/"+branch+"/"+file;
+    } else {
+        tempurl = repo_url+"/blob/"+branch+"/"+file;
+    }
+
+    temp = "SELECT file.fid FROM file WHERE file.furl='"+tempurl+"';";
+    if (mysql_query(mysql, temp.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+
+    // Store the result of the query
+    result = mysql_store_result(mysql);
+    if (result == NULL){
+        finish_with_error(mysql, 4);
+        return 0;
+    }
+    row = mysql_fetch_row(result);
+    if (!row) {
+        return 0;
+    }
+    string fid = (string)row[0];
+    time_t now = time(0);
+
+    tm *ltm = localtime(&now);
+
+    string timetemp = to_string((ltm->tm_year)+1900)+"-"+to_string(ltm->tm_mon+1)+"-"+to_string(ltm->tm_mday)+" "+to_string(ltm->tm_hour)+":"+to_string(ltm->tm_min)+":"+to_string(1+ltm->tm_sec);
+
+    temp = "INSERT INTO commits VALUES (NULL, '"+message+"', '"+fid+"', '"+hash+"', '"+timetemp+"','"+username+"', '"+rid+"');";
+
+    if (mysql_query(mysql, temp.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+
+    // Free the memory that stores the result
+    mysql_free_result(result);
+    return 1;
+}
+
+int insertFiles(string file, string repo_url, string branch) {
+
+    if (file.substr(file.length()-1, 1) == "\n")
+        file = file.substr(0, file.length()-1);
+
+    string tempurl;
+    string git = ".git";
+    if (strcmp(repo_url.substr(repo_url.length()-4).c_str(), git.c_str()) == 0) {
+        tempurl = repo_url.substr(0, repo_url.length()-4)+"/blob/"+branch+"/"+file;
+    } else {
+        tempurl = repo_url+"/blob/"+branch+"/"+file;
+    }
+    string temp = "SELECT rid FROM repo WHERE repo.rurl='"+repo_url+"';";
+    if (mysql_query(mysql, temp.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+
+    // Store the result of the query
+    MYSQL_RES * result = mysql_store_result(mysql);
+    if (result == NULL){
+        finish_with_error(mysql, 4);
+        return 0;
+    }
+    MYSQL_ROW row;
+    row = mysql_fetch_row(result);
+    if (row) {
+        string temp = "SELECT * FROM file WHERE file.furl='"+tempurl+"';";
+        if (mysql_query(mysql, temp.c_str())){
+            finish_with_error(mysql,3);
+            return 0;
+        }
+
+        // Store the result of the query
+        MYSQL_RES * result = mysql_store_result(mysql);
+        if (result == NULL){
+            finish_with_error(mysql, 4);
+            return 0;
+        }
+        MYSQL_ROW row;
+        row = mysql_fetch_row(result);
+        if (row) {
+            return 1;
+        } else {
+            temp = "INSERT INTO file VALUES (NULL,'"+tempurl+"', '"+(string)row[0]+"');";
+            if (mysql_query(mysql, temp.c_str())){
+                finish_with_error(mysql,3);
+                return 0;
+            }
+        }
+    } else {
+        return 0;
+    }
+
+    // Free the memory that stores the result
+    mysql_free_result(result);
+    return 1;
 
 }
 
@@ -381,7 +630,7 @@ bool insertUser(string username) {
 } */
 
 // This function takes in a tag and makes a new page
-void docuwrite(string tag, string hash, string name, string message, string date, ofstream outfile){
+void docuwrite(string tag, string hash, string name, string message, ofstream outfile){
     
     outfile << "## " << tag << endl;
     outfile << endl;
@@ -390,7 +639,7 @@ void docuwrite(string tag, string hash, string name, string message, string date
     outfile << final_msg << endl;
     outfile << endl;
 
-    final_msg = "Date :" + date;
+    //final_msg = "Date :" + date;
     outfile << final_msg << endl;
     outfile << endl;
 
