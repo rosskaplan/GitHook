@@ -7,15 +7,7 @@ branch=$(git show-branch)
 repo_url=$(git remote get-url origin)
 
 # call database to populate the database
-pwd
 cd wiki
-pwd
-# git status
-# pwd
-# git checkout master
-# pwd
-# git status
-# pwd
 git pull origin master
 cd ..
 g++ --std=c++11 ./scripts/formatWiki.cpp ./scripts/utils.cpp ./scripts/utils.h -o ./scripts/formatWiki -lmysqlclient

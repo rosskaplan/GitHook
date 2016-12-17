@@ -11,11 +11,12 @@ author_name="$(git config --global user.name)"
 
 cd ../..
 # Step 2 : Initialize empty wiki repository
-git submodule add $new_link wiki
-git submodule init wiki
-git submodule update wiki
-pwd
-cd .git
+mkdir wiki
+cd wiki
+git init
+git remote add origin $new_link
+git pull origin master
+cd ../.git
 
 # Step 3 : Set up post-commit into .git
 mv GitHook-master/install/post-commit ./hooks/post-commit
