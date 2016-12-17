@@ -1,0 +1,5 @@
+#!/bin/sh
+repo_link="$(git remote get-url origin)"
+auth_name="$GIT_AUTHOR_NAME"
+g++ describe.cpp utils.cpp utils.h -o describe -lmysqlclient
+./describe -n "$repo_link" -u "$auth_name" -d # note to self: prompt user to enter username if GIT author name is not set

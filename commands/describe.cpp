@@ -15,6 +15,7 @@ int main(int argc ,char ** argv){
     MYSQL *con;
     MYSQL_ROW row, row1;
     MYSQL_RES *result, *result1;
+    bool detailed;
     string rurl, rid,q, uname;
     int access = 0;
     for (int i = 0 ; i < argc; i++){
@@ -26,6 +27,8 @@ int main(int argc ,char ** argv){
             }else{
                 uname = argv[i+1];
             }
+        }else if (strcmp(argv[i], "-d") == 0){
+            detailed = true;
         }
     }
 
@@ -69,7 +72,7 @@ int main(int argc ,char ** argv){
         finish_with_error(con, "querying the database");
     }
     result = mysql_store_result(con);
-    q = "SELECT C.uname, count(DISTINCT hash) FROM commits C WHERE C.repo="+rid+" GROUP BY C.uname";
+    q = "SELECT C.uname, count(DISTINCT C.hash) FROM commits C WHERE C.repo="+rid+" GROUP BY C.uname;";
     if (mysql_query(con, q.c_str()) != 0){
         finish_with_error(con, "querying the database");
     }
@@ -79,15 +82,26 @@ int main(int argc ,char ** argv){
         cout << row1[0] << " : " << row1[1] << " commits" << endl;        
     }
     mysql_free_result(result);
+    mysql_free_result(result1);
     
     // get tags
     cout << endl;
-    q = "SELECT DISTINCT T.tname FROM repo R, tags T, contained_tags CT where CT.rid="+rid+" and CT.tid=T.tid";
+    if (detailed){
+        q = "SELECT C.uname, T.tname, count(DISTINCT C.hash) from commits C, tags T, tagged_changes TC WHERE C.repo="+rid+" and C.hash=TC.hash and TC.tid=T.tid GROUP BY C.uname, T.tname;";
+    }else{
+        q = "SELECT DISTINCT T.tname FROM repo R, tags T, contained_tags CT where CT.rid="+rid+" and CT.tid=T.tid ORDER BY T.tname";
+    }
     cout << "----------TAGS----------" << endl;
     mysql_query(con, q.c_str());
     result = mysql_store_result(con);
-    while (row=mysql_fetch_row(result)){
-        cout << row[0] << endl;
+    if (detailed){
+        while (row=(mysql_fetch_row(result))){
+            cout << row[1] << " : " << row[0] << " - " << row[2] << " commits" << endl;  
+        }
+    }else{
+        while (row=mysql_fetch_row(result)){
+            cout << row[0] << endl;
+        }
     }
     mysql_free_result(result);
     mysql_close(con);
