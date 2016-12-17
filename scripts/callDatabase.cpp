@@ -15,6 +15,8 @@
 #include <ctime>
 #include <time.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 #include <mysql/mysql.h>
 
 using namespace std;
@@ -178,10 +180,12 @@ int main(int argc, char** argv) {
             cerr << "Failed to add a tag to your repo." << endl;
             exit(-1);
         }
+        // TODO: contained_tags tuples need to be unique
         if (!insertContainedTag(tags[i], rurl)) {
             cerr << "Failed to add a tag to contained tags." << endl;
             exit(-1);
         }
+        // TODO: Tagged_changes tuple needs to be unique too
         if (!insertTaggedChanges(tags[i], hash)) {
             cerr << "Failed to add a tag to tagged changes." << endl;
             exit(-1);
@@ -208,13 +212,34 @@ int main(int argc, char** argv) {
          finish_with_error(mysql, 4);
          return 0;
     }
-    MYSQL_ROW row = mysql_fetch_row(result);
-    rid=row[0];
+    MYSQL_ROW row = mysql_fetch_row(result); 
+    rid=(string)row[0];
+    mysql_free_result(result);
     mysql_close(mysql);
-    if (execl("./formatWiki",hash.c_str(),rid.c_str(), "\0") == -1){
-        cerr << "Error occurred when executing ./formatWiki: " << strerror(errno) << endl;
-        exit(-1);
+    int pid;
+    cout << "HI" << endl;
+    char ** newargs = (char**)malloc(4*sizeof(char*));
+    string commandore="./scripts/formatWiki";
+    newargs[0] = (char*)commandore.c_str();
+    newargs[1] = (char*)hash.c_str();
+    newargs[2] = (char*)rid.c_str();
+    newargs[3] = NULL;
+    cout << "HEY" << endl;
+    switch(pid=fork()){
+        case -1:
+            cerr << "Cannot fork ./scripts/formatWiki: " << strerror(errno) << endl;
+            break;
+        case 0:
+            if ((execvp(newargs[0], newargs)) == -1){
+                cerr << "Cannot execute ./scripts/formatWiki: "  << strerror(errno) << endl;
+            }
+            break;
+        default:
+            if (wait(NULL) == -1){
+                fprintf(stderr, "Cannot wait for ./scripts/formatWiki: %s\n", strerror(errno));    
+            }
     }
+    free(newargs);
     return 0;
 }
 
@@ -302,7 +327,7 @@ int insertTag(string tag) {
 }
 
 int insertTaggedChanges(string tag, string hash) {
-
+    // check whether the tuple exists yet
     string temp = "SELECT tags.tid FROM tags WHERE tags.tname='"+tag+"';";
     if (mysql_query(mysql, temp.c_str())){
         finish_with_error(mysql,3);
@@ -397,10 +422,9 @@ int insertCommit(string message, string hash, string username, string file, stri
 }
 
 int insertFiles(string file, string repo_url, string branch) {
-
     if (file.substr(file.length()-1, 1) == "\n")
         file = file.substr(0, file.length()-1);
-
+    
     string tempurl;
     string git = ".git";
     if (strcmp(repo_url.substr(repo_url.length()-4).c_str(), git.c_str()) == 0) {
@@ -413,7 +437,6 @@ int insertFiles(string file, string repo_url, string branch) {
         finish_with_error(mysql,3);
         return 0;
     }
-
     // Store the result of the query
     MYSQL_RES * result = mysql_store_result(mysql);
     if (result == NULL){
@@ -435,9 +458,11 @@ int insertFiles(string file, string repo_url, string branch) {
             finish_with_error(mysql, 4);
             return 0;
         }
-        MYSQL_ROW row;
-        row = mysql_fetch_row(result);
-        if (row) {
+        MYSQL_ROW row1;
+        row1 = mysql_fetch_row(result);
+        cout << "IN IF STATEMENT" << endl;
+        cout << row[0] << endl;
+        if (row1) {
             return 1;
         } else {
             temp = "INSERT INTO file VALUES (NULL,'"+tempurl+"', '"+(string)row[0]+"');";
@@ -449,7 +474,6 @@ int insertFiles(string file, string repo_url, string branch) {
     } else {
         return 0;
     }
-
     // Free the memory that stores the result
     mysql_free_result(result);
     return 1;

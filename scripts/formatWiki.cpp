@@ -23,6 +23,7 @@ void addToPage(string commitLine, string tag){
     MYSQL_RES *result;
     MYSQL_ROW row;
     fstream fs;
+    cout << "HEY" << endl;
     q = "SELECT DISTINCT P.pid FROM page P WHERE P.rid="+rid+" and P.ptitle='"+tag+"';";
     if (mysql_query(mysql, q.c_str()) != 0){
         finish_with_error(mysql, "querying the database");
