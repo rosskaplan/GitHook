@@ -13,8 +13,8 @@ using namespace std;
 
 int main(int argc ,char ** argv){
     MYSQL *con;
-    MYSQL_ROW row;
-    MYSQL_RES * result;
+    MYSQL_ROW row, row1;
+    MYSQL_RES *result, *result1;
     string rurl, rid,q, uname;
     int access = 0;
     for (int i = 0 ; i < argc; i++){
@@ -22,8 +22,7 @@ int main(int argc ,char ** argv){
             rurl = argv[i+1];
         }else if (strcmp(argv[i], "-u") == 0){
             if (strcmp(argv[i+1], "") == 0){
-                cout << "Please enter your username : ";
-                cin >> uname;
+                cerr << "Your $GIT_AUTHOR_NAME is not set. Please set it to your github username" << endl;
             }else{
                 uname = argv[i+1];
             }
@@ -40,13 +39,10 @@ int main(int argc ,char ** argv){
     // Security check, see whether the user can access to the repository first
     rid = hasAccess(con, uname, rurl);
     if (((string)rid).compare("") == 0) {
-        cerr << "You do not work in this repo -- you do not have access to " << rurl << endl;
-        mysql_free_result(result);
+        cerr << "You do not work in this repo -- you do not have access" << endl;
         mysql_close(con);
         exit(1);
     }
-    mysql_free_result(result);
-    
     // get the repo name, url and wiki url first
     q = "SELECT DISTINCT R.rname, R.rurl, WIKI.wurl, R.rid FROM repo R, wiki WIKI WHERE R.rid="+rid+" and WIKI.repoid = R.rid;";
     if (mysql_query(con, q.c_str()) != 0){
@@ -57,6 +53,7 @@ int main(int argc ,char ** argv){
     if (result == NULL){
         finish_with_error(con, "storing result from query");
     }
+    cout << "NEW" ;
     row = mysql_fetch_row(result);
     cout << "----------REPOSITORY SUMMARY----------"<< endl;
     cout << "Repository Name : " << row[0] << endl;
@@ -68,11 +65,18 @@ int main(int argc ,char ** argv){
     
     // get contributors
     q = "SELECT DISTINCT U.uname FROM users U, works_in W where W.rid=" + rid + " and W.uname = U.uname;";
-    mysql_query(con, q.c_str());
-    cout << "----------CONTRIBUTORS----------" << endl;
+    if (mysql_query(con, q.c_str()) != 0){
+        finish_with_error(con, "querying the database");
+    }
     result = mysql_store_result(con);
-    while (row=mysql_fetch_row(result)){
-        cout << row[0] << endl;        
+    q = "SELECT C.uname, count(DISTINCT hash) FROM commits C WHERE C.repo="+rid+" GROUP BY C.uname";
+    if (mysql_query(con, q.c_str()) != 0){
+        finish_with_error(con, "querying the database");
+    }
+    cout << "----------CONTRIBUTORS----------" << endl;
+    result1 = mysql_store_result(con);
+    while (row1=mysql_fetch_row(result1)){
+        cout << row1[0] << " : " << row1[1] << " commits" << endl;        
     }
     mysql_free_result(result);
     
