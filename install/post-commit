@@ -8,28 +8,23 @@ repo_url=$(git remote get-url origin)
 
 # call database to populate the database
 pwd
-git submodule init
+cd wiki
 pwd
-git submodule update
-pwd
-# cd wiki
-# pwd
 # git status
 # pwd
 # git checkout master
 # pwd
 # git status
 # pwd
-# git pull
-# cd ..
+git pull origin master
+cd ..
 g++ --std=c++11 ./scripts/formatWiki.cpp ./scripts/utils.cpp ./scripts/utils.h -o ./scripts/formatWiki -lmysqlclient
 g++ --std=c++11 ./scripts/callDatabase.cpp -o ./scripts/callDatabase -lmysqlclient
 ./scripts/callDatabase -e "$GIT_AUTHOR_EMAIL" -n "$GIT_AUTHOR_NAME" -b "$branch" -r "$repo_url" -m "$msg" -f "$files"
 
-sudo git submodule update --init --recursive
-# cd wiki
-# git add *
-# git commit -m "committing"
-# git push origin master
-# cd ..
+cd wiki
+git add *
+git commit -m "committing"
+git push origin master
+cd ..
 ~             
