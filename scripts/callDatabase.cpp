@@ -14,7 +14,7 @@
 #include <string.h>
 #include <ctime>
 #include <time.h>
-
+#include <unistd.h>
 #include <mysql/mysql.h>
 
 using namespace std;
@@ -43,10 +43,9 @@ string rid;
 
 int main(int argc, char** argv) {
 
-    string email, name, hash, temp, message, branch;
+    string email, name, hash, temp, message, branch, q, tagtemp;
     vector<string> files, tags;
     int count = 0;
-    string tagtemp;
 
     for (int i = 0; i < argc; i++) {
         if (strcmp(argv[i], "-e") == 0) {
@@ -132,20 +131,13 @@ int main(int argc, char** argv) {
     cout << "hash: " << hash << endl;
     cout << "repo_url: " << rurl << endl;
     cout << "message: " << message << endl;
-    string wiki_msg;
-    // Concantenate all the information to form an entry in the wiki
-    //wiki_msg =  date + "\t" + name + " changed ";
+    
     for (int i = 0 ; i < files.size(); ++i){
         cout << "file: " << files[i] << endl;
-        wiki_msg += files[i] + " ";
     }
-    wiki_msg += ": "+ message;
     string command;
     for (int i = 0; i < tags.size(); ++i) {
         cout << "tag: " << tags[i] << endl;
-        //insertPage(tags[i]);
-
-
     }
 
     // Initializing MYSQL handler, which would be useful when initializing connection
@@ -205,18 +197,32 @@ int main(int argc, char** argv) {
             exit(-1);
         }
     }
-
+    q = "SELECT DISTINCT R.rid FROM repo R WHERE R.rurl='"+rurl+"';";
+    if (mysql_query(mysql, q.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+    // Store the result of the query
+    MYSQL_RES * result = mysql_store_result(mysql);
+    if (result == NULL){
+         finish_with_error(mysql, 4);
+         return 0;
+    }
+    MYSQL_ROW row = mysql_fetch_row(result);
+    rid=row[0];
     mysql_close(mysql);
-
+    if (execl("./formatWiki",hash.c_str(),rid.c_str(), "\0") == -1){
+        cerr << "Error occurred when executing ./formatWiki: " << strerror(errno) << endl;
+        exit(-1);
+    }
     return 0;
-
 }
 
 int insertContainedTag(string tag, string repo_url) {
 
     string temp = "SELECT tags.tid FROM tags WHERE tags.tname='"+tag+"';";
     if (mysql_query(mysql, temp.c_str())){
-        finish_with_error(mysql,3);
+    finish_with_error(mysql,3);
         return 0;
     }
     // Store the result of the query
@@ -601,80 +607,7 @@ bool insertUser(string username) {
     return 1;
 }
 
-// This function attemps to insert a page into the database into the database. If a page is successfully inserted, We need to add a page to the Wiki
-/*bool insertPage(string tag){
-    string q;
-    // see whether a repo contains the tag yet
-    q = "SELECT DISTINCT T.tname FROM repo R, tags T, contained_tags CT where CT.rid=R.rid and R.rurl='"+rurl+"' and CT.tid=T.tid and T.tname='"+tag+"';";
-    if (mysql_query(mysql,q.c_str())){
-        finish_with_error(mysql,3);
-        return 0;
-    }
-    MYSQL_RES * result = mysql_store_result(mysql);
-    if (result == NULL){
-       finish_with_error(mysql,4);
-       return 0;
-    }
-    int num_rows = mysql_num_rows(result);
-    mysql_free_result(result);
-    string tid;
-    if (num_rows == 0){
-        // see whether there is a tag is in DB
-        q = "SELECT DISTINCT T.tname from tags T where T.tname='"+tags+"';";
-        if (mysql_query(mysql,q.c_str())){
-            finish_with_error(mysql, 3);
-            return 0;
-        }
-        result = mysql_store_result(mysql);
-        if (result == NULL){
-            finish_with_error(mysql,4);
-            return 0;
-        }
-        int num_rows2=mysql_num_rows(result);
-        mysql_free_result(result);
-        if (num_rows2 == 0){
-            q = "INSERT INTO tags VALUES(NULL,'"+tag+"');";
-            if (mysql_query(mysql, q.c_str())){
-                finish_with_error(mysql,3);
-                return 0;
-            }
-        }
-        q = "SELECT T.tid FROM tags WHERE tname='"+tag+"';";
-        if (mysql_query(mysql, q.c_str())){
-            finish_with_error(mysql,3);
-            return 0;
-        }
-        result = mysql_store_result(mysql);
-        if (result == NULL){
-            finish_with_error(mysql, 4);
-            return 0;
-        }
-        tid = mysql_fetch_row(result)[0];
-        q = "INSERT INTO "
-        // get the tid and insert into contained_tags;
-        // insert into page;
 
-    }
-    return 0;
-} */
-
-// This function takes in a tag and makes a new page
-void docuwrite(string tag, string hash, string name, string message, ofstream outfile){
-    
-    outfile << "## " << tag << endl;
-    outfile << endl;
-    
-    string final_msg = "["+hash+"]" + name + " : " + message;
-    outfile << final_msg << endl;
-    outfile << endl;
-
-    //final_msg = "Date :" + date;
-    outfile << final_msg << endl;
-    outfile << endl;
-
-    outfile << endl;
-    outfile.close();
-}
 
 void finish_with_error(MYSQL *con, int n){
     fprintf(stderr,"ERROR! %d %s\n", n, mysql_error(con));
