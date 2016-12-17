@@ -1,4 +1,37 @@
 datetime, uname, furl, hash, message, tag
-2016-12-06 00:00:00,brendabrandy,url1,a1234567,this is a test commit,Animation
-2016-12-06 00:00:00,gordonmac,url2,a12388567,this is a test commit 2,Cplusplus
-2016-12-06 00:00:00,brendabrandy,url1,a1234567,this is a test commit,Cplusplus
+2016-12-17 14:59:08,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/install/.post-commit.swp,4f6e2dd6b8ac026c80f841c94da54aacf8ab1d7b,finish format wiki script,wiki
+2016-12-17 14:59:08,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/callDatabase,4f6e2dd6b8ac026c80f841c94da54aacf8ab1d7b,finish format wiki script,wiki
+2016-12-17 14:59:08,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/callDatabase.cpp,4f6e2dd6b8ac026c80f841c94da54aacf8ab1d7b,finish format wiki script,wiki
+2016-12-17 14:59:08,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/formatWiki,4f6e2dd6b8ac026c80f841c94da54aacf8ab1d7b,finish format wiki script,wiki
+2016-12-17 14:59:09,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/formatWiki.cpp,4f6e2dd6b8ac026c80f841c94da54aacf8ab1d7b,finish format wiki script,wiki
+2016-12-17 16:02:19,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/callDatabase,2960eb916946d5d73b2a9ef3a813dbb9181e8a3e,testing new script,test2
+2016-12-17 16:02:19,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/formatWiki,2960eb916946d5d73b2a9ef3a813dbb9181e8a3e,testing new script,test2
+2016-12-17 16:02:19,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/formatWiki.cpp,2960eb916946d5d73b2a9ef3a813dbb9181e8a3e,testing new script,test2
+2016-12-17 16:43:42,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/callDatabase,07745a41f5f3896ec58cb5bdf80978c79f7f2d48,new tests,test
+2016-12-17 16:43:43,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/callDatabase.cpp,07745a41f5f3896ec58cb5bdf80978c79f7f2d48,new tests,test
+2016-12-17 16:43:43,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/formatWiki,07745a41f5f3896ec58cb5bdf80978c79f7f2d48,new tests,test
+2016-12-17 16:45:38,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/callDatabase,4eb591e27543bdfa2db31e3da3e408324ef58802,new tests,test
+2016-12-17 16:45:38,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/formatWiki,4eb591e27543bdfa2db31e3da3e408324ef58802,new tests,test
+2016-12-17 16:00:21,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/tests/newtest,7ea09dce39d507a2860f1caa27d4a46a03d8e612,testing new script,test
+2016-12-17 16:02:19,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/tests/newtest,2960eb916946d5d73b2a9ef3a813dbb9181e8a3e,testing new script,test2
+2016-12-17 16:02:19,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/changeWiki.sh,2960eb916946d5d73b2a9ef3a813dbb9181e8a3e,testing new script,test2
+2016-12-17 16:10:38,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/tests/newdir.txt,309e3d22a804034b3d52f9574ceb56e8da96302e,testing directory,test
+2016-12-17 16:38:17,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/.gitmodules,3879597efe0f728733477428fe1942608429e23a,new tests,test
+2016-12-17 16:38:17,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/install/post-commit,3879597efe0f728733477428fe1942608429e23a,new tests,test
+2016-12-17 16:38:17,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/tests/newtests,3879597efe0f728733477428fe1942608429e23a,new tests,test
+2016-12-17 16:43:43,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/formatWiki.cpp,07745a41f5f3896ec58cb5bdf80978c79f7f2d48,new tests,test
+2016-12-17 16:43:43,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/tests/newtests,07745a41f5f3896ec58cb5bdf80978c79f7f2d48,new tests,test
+2016-12-17 16:45:39,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/tests/newtests,4eb591e27543bdfa2db31e3da3e408324ef58802,new tests,test
+2016-12-17 16:47:08,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/tests/newtests,ee1a05d77fc87dfe741b6d5f4e1356bafbbf9f08,new tests,test
+2016-12-17 16:54:08,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/tests/newtests,ac30d24045585d0c0b68467dae5fb714fb06324e,new tests,test
+2016-12-17 16:54:38,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/tests/newtests,8fcd3c4a169f03d9987e05a0edbbedab08d460dc,new tests,test
+2016-12-17 17:05:57,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/install/post-commit,cbd3aafd0378777bdb986fd8fba89c1b52e4e341,new commits,test
+2016-12-17 17:43:34,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/install/post-commit,d939f509935ed32810fa3e2dc4aacb4594b19393,submodule changed to new git,install
+2016-12-17 16:38:18,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/wiki,3879597efe0f728733477428fe1942608429e23a,new tests,test
+2016-12-17 16:43:43,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/scripts/callDatabase.cp,07745a41f5f3896ec58cb5bdf80978c79f7f2d48,new tests,test
+2016-12-17 17:05:57,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/wiki,cbd3aafd0378777bdb986fd8fba89c1b52e4e341,new commits,test
+2016-12-17 17:05:57,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/newtest.txt,cbd3aafd0378777bdb986fd8fba89c1b52e4e341,new commits,test
+2016-12-17 17:06:24,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/wiki,0e0ceab25154cdf7d1982d7e9c9dabeb16a4d04e,new commits,test
+2016-12-17 17:06:23,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/newtest.txt,0e0ceab25154cdf7d1982d7e9c9dabeb16a4d04e,new commits,test
+2016-12-17 17:43:34,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/wiki,d939f509935ed32810fa3e2dc4aacb4594b19393,submodule changed to new git,install
+2016-12-17 17:43:34,brendabrandy,https://github.com/rosskaplan/GitHook/blob/master/install/install.sh,d939f509935ed32810fa3e2dc4aacb4594b19393,submodule changed to new git,install

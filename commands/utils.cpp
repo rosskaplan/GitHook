@@ -52,7 +52,6 @@ bool existDB(MYSQL *con, string repo_link){
 
 bool existUser(MYSQL *con, string uname){
     string q = "SELECT DISTINCT U.uname FROM users U where U.uname='"+uname+"';";
-    cout << q << endl;
     MYSQL_ROW row;
     bool exist;
     if (mysql_query(con, q.c_str()) != 0){
@@ -62,7 +61,6 @@ bool existUser(MYSQL *con, string uname){
     if (result == NULL){
         finish_with_error(con, "obtaining result");
     }
-    cout << mysql_num_rows(result) << endl;
     if (mysql_num_rows(result) == 0) return false;
     return true;
 }

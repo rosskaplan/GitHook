@@ -5,11 +5,11 @@ Ever project since the beginning of time has had insufficient documentation. Doe
 Introducing GITHOOK Documentation!  we'll run some scripts each time you commit that make the documentation for you!  Just include tags in your commit message wrapped in asterisks and it'll create a wiki page on your github for all commits using that tag!
 
 ## Functionality
-1. Autogenerating wiki : After the package is installed, whenever you enter a commit, a related comment about the commit would appear in the wiki! (in progress, about 70% done)
+1. Autogenerating wiki : After the package is installed, whenever you enter a commit, a related comment about the commit would appear in the wiki!
 
 2. Full import wiki (not done yet)
 
-3. Full export wiki (not done yet)
+3. Full export wiki 
 
 4. change name of tag (not done yet)
 

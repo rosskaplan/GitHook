@@ -74,7 +74,7 @@ int main(int argc, char ** argv){
     }
     
     // query the database for the commits in the repo
-    q = "SELECT DISTINCT C.cdatetime, C.uname, F.furl, C.hash, C.cmsg, T.tname FROM commits C, file F, tags T, tagged_changes TC WHERE C.repo="+rid+" AND F.rid=C.repo AND C.fid=F.fid AND TC.cid=C.cid AND TC.tid=T.tid;";
+    q = "SELECT DISTINCT C.cdatetime, C.uname, F.furl, C.hash, C.cmsg, T.tname FROM commits C, file F, tags T, tagged_changes TC WHERE C.repo="+rid+" AND F.rid=C.repo AND C.fid=F.fid AND TC.hash=C.hash AND TC.tid=T.tid;";
     
     if (mysql_query(con, q.c_str()) != 0){
         finish_with_error(con, "querying the database");
