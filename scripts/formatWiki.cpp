@@ -36,7 +36,7 @@ void addToPage(string commitLine, string tag){
 
     num_rows = mysql_num_rows(result);
     mysql_free_result(result);
-    fs.open((tag+".md").c_str(), fstream::out|fstream::app);
+    fs.open(("./wiki/"tag+".md").c_str(), fstream::out|fstream::app);
     if (num_rows > 1){
         // something wrong
         cerr << "Error in the number of rows of page: " << num_rows << endl;
