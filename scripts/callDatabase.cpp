@@ -217,14 +217,12 @@ int main(int argc, char** argv) {
     mysql_free_result(result);
     mysql_close(mysql);
     int pid;
-    cout << "HI" << endl;
     char ** newargs = (char**)malloc(4*sizeof(char*));
     string commandore="./scripts/formatWiki";
     newargs[0] = (char*)commandore.c_str();
     newargs[1] = (char*)hash.c_str();
     newargs[2] = (char*)rid.c_str();
     newargs[3] = NULL;
-    cout << "HEY" << endl;
     switch(pid=fork()){
         case -1:
             cerr << "Cannot fork ./scripts/formatWiki: " << strerror(errno) << endl;
@@ -460,8 +458,6 @@ int insertFiles(string file, string repo_url, string branch) {
         }
         MYSQL_ROW row1;
         row1 = mysql_fetch_row(result);
-        cout << "IN IF STATEMENT" << endl;
-        cout << row[0] << endl;
         if (row1) {
             return 1;
         } else {
