@@ -20,3 +20,8 @@
 [2016-12-18 02:32:24] brendabrandy made changes to /commands/query, /commands/query.cpp, /wiki:  finish querying command
 
 
+[comment]: 560e5252737f4ac15e88e681e9b8e9ccbb2433bf
+
+[2016-12-18 03:40:42] brendabrandy made changes to /scripts/.addTagByHash.cpp.swp, /scripts/addTagByHash, /scripts/addTagByHash.cpp, /wiki:  finish add tag command
+
+
