@@ -52,3 +52,8 @@
 
 [2016-12-17 22:49:39] Ross Kaplan made changes to /tests/test:  more mistakes here!
 
+[comment]: 87d0ce2784398e57d2dad894fc5e021ab02ae3fd
+
+[2016-12-17 23:13:18] brendabrandy made changes to /removeTagByBash, /scripts/callDatabase.cpp, /wiki:  committing callDatabase.cpp
+
+
