@@ -129,6 +129,7 @@ int main(int argc, char ** argv){
     result = mysql_store_result(con);
     num_fields = mysql_num_fields(result);
     while (row=mysql_fetch_row(result)){
+        printRow(row);
         for (int i = 0; i < num_fields; i++){
             printf("%s ", row[i]? row[i]:"NULL");
         }
@@ -138,5 +139,10 @@ int main(int argc, char ** argv){
     return 0;
 }
 
-
-
+void printRow(MYSQL ROW){
+    string hasher;
+    hasher = row[1];
+    cout << "commit: "<< row[1] << endl;
+    cout << "Author: " << row[0] << endl;
+    
+}
