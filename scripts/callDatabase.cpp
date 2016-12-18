@@ -153,7 +153,6 @@ int main(int argc, char** argv) {
         finish_with_error(mysql,2);
         return 1;
     }
-
     //Error handling for wiki insertions
     int tempint = insertWikiURL(rurl);
     if (tempint == 2) {
@@ -180,12 +179,10 @@ int main(int argc, char** argv) {
             cerr << "Failed to add a tag to your repo." << endl;
             exit(-1);
         }
-        // TODO: contained_tags tuples need to be unique
         if (!insertContainedTag(tags[i], rurl)) {
             cerr << "Failed to add a tag to contained tags." << endl;
             exit(-1);
         }
-        // TODO: Tagged_changes tuple needs to be unique too
         if (!insertTaggedChanges(tags[i], hash)) {
             cerr << "Failed to add a tag to tagged changes." << endl;
             exit(-1);
@@ -259,10 +256,29 @@ int insertContainedTag(string tag, string repo_url) {
     // Show the result of the query
     MYSQL_ROW row;
     row = mysql_fetch_row(result);
-    if (row) {
-        string temp_tid = (string)row[0];
+    if (!row) {
+        return 0;
+    }
+    string temp_tid = (string)row[0];
 
-        temp = "SELECT rid FROM repo WHERE repo.rurl='"+repo_url+"';";
+    temp = "SELECT rid FROM repo WHERE repo.rurl='"+repo_url+"';";
+    if (mysql_query(mysql, temp.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+
+    // Store the result of the query
+    result = mysql_store_result(mysql);
+    if (result == NULL){
+        finish_with_error(mysql, 4);
+        return 0;
+    }
+    row = mysql_fetch_row(result);
+    if (row) {
+        string temp_rid = (string)row[0];
+        
+        temp = "SELECT * FROM contained_tags WHERE contained_tags.tid='"+temp_tid+"' AND contained_tags.rid='"+temp_rid+"';";
+        
         if (mysql_query(mysql, temp.c_str())){
             finish_with_error(mysql,3);
             return 0;
@@ -276,14 +292,15 @@ int insertContainedTag(string tag, string repo_url) {
         }
         row = mysql_fetch_row(result);
         if (row) {
-            temp = "INSERT INTO contained_tags VALUES ('"+temp_tid+"', '"+(string)row[0]+"');";
-            if (mysql_query(mysql, temp.c_str())){
-                finish_with_error(mysql,3);
-                return 0;
-            }
-        } else {
+            return 1;
+        }
+        temp = "INSERT INTO contained_tags VALUES ('"+temp_tid+"', '"+temp_rid+"');";
+        if (mysql_query(mysql, temp.c_str())){
+            finish_with_error(mysql,3);
             return 0;
         }
+    } else {
+        return 0;
     }
     // Free the memory that stores the result
     mysql_free_result(result);
