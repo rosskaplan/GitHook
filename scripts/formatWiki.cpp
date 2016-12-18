@@ -84,7 +84,6 @@ void addToPage(string commitLine, string tag, string hasher){
     // if it doesn't, check database to verify it doesn't exist
     // and create a new page, and do the same as if it exist
 }
-
 // This function serves to parse a file url and obtain the filename
 string parseName(string furl){
     stringstream ss(furl);
@@ -100,6 +99,7 @@ string parseName(string furl){
     }
     return res;
 }
+
 
 string formatLine(MYSQL_RES * result, string hasher){
     // obtain file and format it into a string like the sample line above
