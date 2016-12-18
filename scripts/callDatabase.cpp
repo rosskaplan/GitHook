@@ -147,7 +147,6 @@ int main(int argc, char** argv) {
     for (int i = 0; i < tags.size(); ++i) {
         cout << "tag: " << tags[i] << endl;
     }
-
     // Initializing MYSQL handler, which would be useful when initializing connection
     // with server
     if ((mysql = mysql_init(NULL)) == NULL){
@@ -572,9 +571,8 @@ int insertWikiURL(string repo_url){
     // Show the result of the query
     MYSQL_ROW row;
     row = mysql_fetch_row(result);
-    string repoid_result = (string)row[0];
-    if (row[0]) {
-        ///*+(string)row[0]*/
+    if (row) {
+        string repoid_result = (string)row[0];
         
         temp = "SELECT repoid FROM wiki WHERE wiki.repoid='"+repoid_result+"';";
         if (mysql_query(mysql, temp.c_str())){
