@@ -74,8 +74,6 @@ void addToPage(string commitLine, string tag, string hasher){
         }
         // as of now, make it so that new commits are added at the end
         // TODO: make the new commits the top;
-        fs << "# Commits " << endl << endl;
-
     }
 
     fs << "[comment]: "<< hasher << endl << endl;
