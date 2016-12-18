@@ -71,6 +71,9 @@ int main(int argc, char** argv) {
         }
         if (strcmp(argv[i],"-r") == 0){
             rurl = argv[i+1];
+            git = ".git";
+            if (strcmp(rurl.substr(rurl.length()-4).c_str(), git.c_str()) == 0)
+                rurl = rurl.substr(0, rurl.length()-4);
         }
         if (strcmp(argv[i], "-m") == 0) {
             //temp = argv[i+1];
