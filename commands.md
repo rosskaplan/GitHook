@@ -15,3 +15,8 @@
 [2016-12-17 22:56:01] brendabrandy made changes to /commands/query, /commands/query.cpp:  made changes
 
 
+[comment]: 423cbef7262be2d1650cb5fed189715a85ee4461
+
+[2016-12-18 02:32:24] brendabrandy made changes to /commands/query, /commands/query.cpp, /wiki:  finish querying command
+
+
