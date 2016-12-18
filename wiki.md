@@ -65,3 +65,8 @@
 [2016-12-17 22:49:39] Ross Kaplan made changes to /tests/test:  more mistakes here!
 
 
+[comment]: 96a3ff6c941b371f33db51784f9fe035f132cbdd
+
+[2016-12-17 22:56:01] brendabrandy made changes to /commands/query, /commands/query.cpp:  made changes
+
+
