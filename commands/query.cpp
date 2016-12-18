@@ -21,8 +21,10 @@ int main(int argc, char ** argv){
     
     // variables and default options
     bool from = false, to = false, limit = false;
-    int lim;
+    int lim, index, num_fields;
     string res;
+    MYSQL_ROW row;
+    MYSQL_RES *result;
     string from_date, to_date, q;
     vector<string> repos = {};
     vector<string> tags = {};
@@ -42,7 +44,7 @@ int main(int argc, char ** argv){
         finish_with_error(con,"connecting to the database");
     }
     
-    while ((ch=getopt_long(argc, argv, "u:r:t:l:",long_options, NULL)) != -1){
+    while ((ch=getopt_long(argc, argv, "u:r:t:l:",long_options, &index)) != -1){
         switch(ch){
             case 0: // specify from date
                 from_date = optarg;
@@ -55,24 +57,19 @@ int main(int argc, char ** argv){
                 // check whether to date is later than from date and earlier than current date
                 break;
             case 'u':   // specify users, current user by default
-                for (; optind < argc && *argv[optind] != '-'; optind++){
-                    if (existUser(con, argv[optind])){
-                        users.push_back(argv[optind]);
-                    }else{
-                        cerr << argv[optind] << "does not exist in the database" << endl;
-                    }
+                if (existUser(con, optarg)){
+                    users.push_back(optarg);
+                }else{
+                    cerr << optarg << "does not exist in the database" << endl;
                 }
+                
                 break;
             case 'r':   // specify repos, current repo by default
-                for (; optind-1 < argc ; optind++){
-                    cout << optind << endl;
-                    if (*argv[optind-1] == '-') break;
-                    if (strcmp((res=existDB(con, argv[optind-1])).c_str(), "") != 0){
-                        repos.push_back(res);
-                        cout << res << endl;
-                    }else{
-                        cerr << argv[optind-1] << "does not exist in the database" << endl;
-                    }
+               if (strcmp((res=existDB(con, optarg)).c_str(), "") != 0){
+                    repos.push_back(res);
+                    cout << res << endl;
+                }else{
+                    cerr << optarg << "does not exist in the database" << endl;
                 }
                 break;
             case 't':   // specify tags, empty by default
@@ -95,25 +92,48 @@ int main(int argc, char ** argv){
     }
     cout << "HALO" << endl;
     // commit, author, hash, date and time, commit message, tags
-    q = "SELECT C.commit, C.uname, C.hash, C.cdatetime, C.cmsg FROM commits C, repo R WHERE C.rid=R.rid AND ";
+    q = "SELECT C.uname, C.hash, C.cdatetime, C.cmsg FROM commits C, repo R WHERE C.repo=R.rid";
     // add rids to select statement
     for (int i = 0 ; i < repos.size(); i++){
-        cout << "HEY" << endl;
         if (i == 0){
+            q += " AND ";
             q += "(";
         }
         q += "C.repo="+repos[i];
         if (i == repos.size()-1){
-            q += ") ";
+            q += ")";
             break;
         } 
         q += " OR ";
     }
-    cout << q << endl;
     // add username to select statement
+    for (int i = 0 ; i < users.size(); i++){
+        if (i == 0){
+            q += " AND ";
+            q += "(";
+        }
+        q+="C.uname='"+users[i]+"'";
+        if (i == users.size()-1){
+            q += ")";
+            break;
+        }
+        q += " OR ";
+    }
+    cout << q << endl;
     // add tids to select statement
     // add time limit to select statement (from and to)
     // get the filenames somehow
+    if (mysql_query(con, q.c_str()) != 0){
+        finish_with_error(con, "Querying the database");
+    }
+    result = mysql_store_result(con);
+    num_fields = mysql_num_fields(result);
+    while (row=mysql_fetch_row(result)){
+        for (int i = 0; i < num_fields; i++){
+            printf("%s ", row[i]? row[i]:"NULL");
+        }
+        cout << endl;
+    }
     mysql_close(con);
     return 0;
 }
