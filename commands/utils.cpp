@@ -34,7 +34,7 @@ string hasAccess(MYSQL *con, string username, string repourl){
     return access;
 }
 
-bool existDB(MYSQL *con, string repo_link){
+string existDB(MYSQL *con, string repo_link){
     string q = "SELECT DISTINCT R.rid FROM repo R where R.rurl='"+repo_link+"'";
     MYSQL_ROW row;
     bool exist;
@@ -46,8 +46,9 @@ bool existDB(MYSQL *con, string repo_link){
        finish_with_error(con, "obtaining result"); 
     }
 
-    if (mysql_num_rows(result) == 0) return false;
-    return true;
+    if (mysql_num_rows(result) == 0) return NULL;
+    row = mysql_fetch_row(result);
+    return (string)row[0];
 }
 
 bool existUser(MYSQL *con, string uname){
@@ -63,6 +64,24 @@ bool existUser(MYSQL *con, string uname){
     }
     if (mysql_num_rows(result) == 0) return false;
     return true;
+  
+}
+
+string existTag(MYSQL *con, string tagname){
+    string q = "SELECT DISTINCT T.tid FROM tags T where T.tname='"+tagname+"';";
+    MYSQL_ROW row;
+    bool exist;
+    if (mysql_query(con, q.c_str()) != 0){
+        finish_with_error(con, "querying the database");
+    }
+    MYSQL_RES *result = mysql_store_result(con);
+    if (result == NULL){
+        finish_with_error(con, "obtaining result");
+    }
+    if (mysql_num_rows(result) == 0) return NULL;
+    row = mysql_fetch_row(result);
+    return row[0];
+
 }
 
 

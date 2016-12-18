@@ -18,9 +18,11 @@ void finish_with_error(MYSQL *con, string s);
 
 // This function checks whether the repo url exist in the database. If the repo does
 // not exist in our database, this function returns false. Else it returns true
-bool existDB(MYSQL *con, string repo_link);
+string existDB(MYSQL *con, string repo_link);
 
 // This function checks whether user exist in the database. If the user does not
 // exist in the database, this function returns false, Else it returns true
 bool existUser(MYSQL *con, string uname);
+
+string existTag(MYSQL *con, string tagname);
 

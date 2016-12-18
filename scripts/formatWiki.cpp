@@ -17,7 +17,7 @@ using namespace std;
 MYSQL *mysql;
 string rid;
 // 
-void addToPage(string commitLine, string tag){
+void addToPage(string commitLine, string tag, string hasher){
     string q, purl, tid;
     int num_rows;
     MYSQL_RES *result;
@@ -78,7 +78,7 @@ void addToPage(string commitLine, string tag){
 
     }
 
-        
+    fs << "[comment]: "<< hasher << endl << endl;
     fs << commitLine << endl << endl;
     fs.close();
     // first see whether the page to the tag exist
@@ -170,7 +170,7 @@ int main(int argc, char ** argv){
     
     num_fields = mysql_num_fields(result);
     while (row=mysql_fetch_row(result)){
-        addToPage(commit_line, row[0]);
+        addToPage(commit_line, row[0] ,hasher);
     }
     mysql_close(mysql);
     return 0;
