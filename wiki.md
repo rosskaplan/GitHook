@@ -2,9 +2,21 @@
 
 [2016-12-17 21:05:34] brendabrandy made changes to /commands/query, /commands/query.cpp, /commands/utils.cpp, /commands/utils.h, /scripts/.formatWiki.cpp.swp, /scripts/changeWiki.sh, /scripts/formatWiki.cpp, /wiki:  starting to add query stuff and trying out wiki
 
+[2016-12-17 22:11:53] Ross Kaplan made changes to /tests/test:  this is a mistake commit
 
-[comment]: 86d205bcb6d4bdf3dff2601d48f6b2fc891d6724
 
-[2016-12-17 21:32:56] brendabrandy made changes to /commands/querer, /commands/querer.cpp, /commands/query, /commands/query.cpp, /commands/utils.cpp, /scripts/.formatWiki.cpp.swp, /scripts/callDatabase, /scripts/formatWiki, /wiki:  wrong commit
+[comment]: 649c212bf842cf9b06e547ad2cf0f2e8f28de8a3
+
+[2016-12-17 22:13:40] Ross Kaplan made changes to /tests/test:  this is a mistake commit
+
+
+[comment]: 68528545b807e8d46999b981429739f5948be3e2
+
+[2016-12-17 22:16:44] Ross Kaplan made changes to /tests/test:  more mistakes
+
+
+[comment]: ff22736e75483617f765069abdff5937c7574e43
+
+[2016-12-17 22:19:30] Ross Kaplan made changes to /tests/test:  more mistakes
 
 
