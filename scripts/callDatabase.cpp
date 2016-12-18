@@ -147,7 +147,6 @@ int main(int argc, char** argv) {
     for (int i = 0; i < tags.size(); ++i) {
         cout << "tag: " << tags[i] << endl;
     }
-
     // Initializing MYSQL handler, which would be useful when initializing connection
     // with server
     if ((mysql = mysql_init(NULL)) == NULL){
@@ -160,6 +159,12 @@ int main(int argc, char** argv) {
         return 1;
     }
     //Error handling for wiki insertions
+    //Error handling for user insertion
+    if (!insertUser(name)) {
+        cerr << "Failed to add user to database." << endl;
+        exit(-1);
+    }
+
     int tempint = insertWikiURL(rurl);
     if (tempint == 2) {
         cerr << "User has not run installer script." << endl;
@@ -169,11 +174,6 @@ int main(int argc, char** argv) {
         exit(-1);
     }
 
-    //Error handling for user insertion
-    if (!insertUser(name)) {
-        cerr << "Failed to add user to database." << endl;
-        exit(-1);
-    }
 
     if (!insertWorksIn(name, rurl)) {
         cerr << "Failed to add a user to a repo." << endl;
@@ -424,6 +424,24 @@ int insertCommit(string message, string hash, string username, string file, stri
         return 0;
     }
     string fid = (string)row[0];
+
+    temp = "SELECT * FROM commits WHERE commits.fid='"+fid+"' AND commits.hash='"+hash+"';";
+    if (mysql_query(mysql, temp.c_str())){
+        finish_with_error(mysql,3);
+        return 0;
+    }
+
+    // Store the result of the query
+    result = mysql_store_result(mysql);
+    if (result == NULL){
+        finish_with_error(mysql, 4);
+        return 0;
+    }
+    row = mysql_fetch_row(result);
+    if (!row) {
+        return 1;
+    }
+
     time_t now = time(0);
 
     tm *ltm = localtime(&now);
@@ -572,9 +590,8 @@ int insertWikiURL(string repo_url){
     // Show the result of the query
     MYSQL_ROW row;
     row = mysql_fetch_row(result);
-    string repoid_result = (string)row[0];
-    if (row[0]) {
-        ///*+(string)row[0]*/
+    if (row) {
+        string repoid_result = (string)row[0];
         
         temp = "SELECT repoid FROM wiki WHERE wiki.repoid='"+repoid_result+"';";
         if (mysql_query(mysql, temp.c_str())){
