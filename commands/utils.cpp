@@ -46,7 +46,7 @@ string existDB(MYSQL *con, string repo_link){
        finish_with_error(con, "obtaining result"); 
     }
 
-    if (mysql_num_rows(result) == 0) return NULL;
+    if (mysql_num_rows(result) == 0) return "";
     row = mysql_fetch_row(result);
     return (string)row[0];
 }
@@ -78,7 +78,7 @@ string existTag(MYSQL *con, string tagname){
     if (result == NULL){
         finish_with_error(con, "obtaining result");
     }
-    if (mysql_num_rows(result) == 0) return NULL;
+    if (mysql_num_rows(result) == 0) return "";
     row = mysql_fetch_row(result);
     return row[0];
 

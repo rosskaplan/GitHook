@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <mysql/mysql.h>
 #include <vector>
+#include <string.h>
 #include <getopt.h>
 #include "utils.h"
 #include "creds.h"
@@ -41,7 +42,7 @@ int main(int argc, char ** argv){
         finish_with_error(con,"connecting to the database");
     }
     
-    while ((ch=getopt_long(argc, argv, "u:r:t:l:",long_options, NULL))){
+    while ((ch=getopt_long(argc, argv, "u:r:t:l:",long_options, NULL)) != -1){
         switch(ch){
             case 0: // specify from date
                 from_date = optarg;
@@ -63,17 +64,20 @@ int main(int argc, char ** argv){
                 }
                 break;
             case 'r':   // specify repos, current repo by default
-                for (; optind < argc && *argv[optind] != '-'; optind++){
-                    if (res=existDB(con, argv[optind])){
+                for (; optind-1 < argc ; optind++){
+                    cout << optind << endl;
+                    if (*argv[optind-1] == '-') break;
+                    if (strcmp((res=existDB(con, argv[optind-1])).c_str(), "") != 0){
                         repos.push_back(res);
+                        cout << res << endl;
                     }else{
-                        cerr << argv[optind] << "does not exist in the database" << endl;
+                        cerr << argv[optind-1] << "does not exist in the database" << endl;
                     }
                 }
                 break;
             case 't':   // specify tags, empty by default
                 for (; optind < argc && *argv[optind] != '-'; optind++){
-                    if (res=existTag(con, argv[optind])){
+                    if (strcmp((res=existTag(con, argv[optind])).c_str(), "") != 0){
                         tags.push_back(argv[optind]);
                     }else{
                         cerr << argv[optind] << "does not exist in the database" << endl;
@@ -82,26 +86,28 @@ int main(int argc, char ** argv){
                 break;
             case 'l':   // specify limit, unlimited by default
                 limit = true;
-                lim = optarg;
+                lim = atoi(optarg);
                 break;
             default:
                 cerr << "git query is wrong!" << endl;
                 return 0;
         }
     }
+    cout << "HALO" << endl;
     // commit, author, hash, date and time, commit message, tags
-    q = "SELECT C.commit, C.uname, C.hash, C.cdatetime, C.cmsg  FROM commits C, repo R WHERE C.rid=R.rid AND ";
+    q = "SELECT C.commit, C.uname, C.hash, C.cdatetime, C.cmsg FROM commits C, repo R WHERE C.rid=R.rid AND ";
     // add rids to select statement
-    for (int i = 0 ; i < repo.size(); i++){
+    for (int i = 0 ; i < repos.size(); i++){
+        cout << "HEY" << endl;
         if (i == 0){
             q += "(";
         }
-        q += "C.repo="+repo[i];
-        if (i == repo.size()-1){
+        q += "C.repo="+repos[i];
+        if (i == repos.size()-1){
             q += ") ";
             break;
         } 
-        q += " AND ";
+        q += " OR ";
     }
     cout << q << endl;
     // add username to select statement
