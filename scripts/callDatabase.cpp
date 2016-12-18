@@ -107,7 +107,10 @@ int main(int argc, char** argv) {
                 }
             }
             message = tagtemp;
-            message.erase(0,1);
+            int temp;
+            while ((temp = message.find("'")) != string::npos) {
+                message.erase(message.begin()+temp);
+            }
         }
         int fileloc;
         string filetemp;
