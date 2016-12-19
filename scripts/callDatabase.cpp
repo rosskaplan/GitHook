@@ -381,7 +381,6 @@ int insertTaggedChanges(string tag, string hash) {
 int insertCommit(string message, string hash, string username, string file, string repo_url, string branch) {
 
     string temp = "SELECT rid FROM repo WHERE repo.rurl='"+repo_url+"';";
-    cout << temp << endl;
     if (mysql_query(mysql, temp.c_str())){
         finish_with_error(mysql,3);
         return 0;
@@ -413,7 +412,6 @@ int insertCommit(string message, string hash, string username, string file, stri
         finish_with_error(mysql,3);
         return 0;
     }
-    cout << temp << endl;
     // Store the result of the query
     result = mysql_store_result(mysql);
     if (result == NULL){
@@ -427,7 +425,6 @@ int insertCommit(string message, string hash, string username, string file, stri
     string fid = (string)row[0];
 
     temp = "SELECT * FROM commits WHERE commits.fid='"+fid+"' AND commits.hash='"+hash+"';";
-    cout << temp << endl;
     if (mysql_query(mysql, temp.c_str())){
         finish_with_error(mysql,3);
         return 0;
@@ -452,7 +449,6 @@ int insertCommit(string message, string hash, string username, string file, stri
     string timetemp = to_string((ltm->tm_year)+1900)+"-"+to_string(ltm->tm_mon+1)+"-"+to_string(ltm->tm_mday)+" "+to_string(ltm->tm_hour)+":"+to_string(ltm->tm_min)+":"+to_string(1+ltm->tm_sec);
 
     temp = "INSERT INTO commits VALUES (NULL, '"+message+"', '"+fid+"', '"+hash+"', '"+timetemp+"','"+username+"', '"+rid+"');";
-    cout << temp << endl;
     if (mysql_query(mysql, temp.c_str())){
         finish_with_error(mysql,3);
         return 0;
