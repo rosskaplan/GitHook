@@ -56,14 +56,7 @@
 
 [2016-12-17 23:13:18] brendabrandy made changes to /removeTagByBash, /scripts/callDatabase.cpp, /wiki:  committing callDatabase.cpp
 
-
 [comment]: d595fc6f78054f7866fa9d33f95a200e81be296b
 
 [2016-12-17 23:13:38] brendabrandy made changes to /scripts/callDatabase.cpp, /wiki:  committing callDatabase.cpp
-
-
-[comment]: 423cbef7262be2d1650cb5fed189715a85ee4461
-
-[2016-12-18 02:32:24] brendabrandy made changes to /commands/query, /commands/query.cpp, /wiki:  finish querying command
-
 
