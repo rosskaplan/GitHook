@@ -55,6 +55,30 @@ To add a tag to the hash 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa':
 
 `./addTagByHash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa tagname`
 
+## Querying
+
+During querying, you can input several options:
+
+-u : specify user
+
+-r : specify repo url
+
+-t : specify tag
+
+--from : specify from date
+
+--to : specify to date
+
+-l : specify the number of commits you want to show
+
+To compiile the command, please run
+
+`g++ ./.git/GitHook-master/commands/query.cpp ./.git/GitHook-master/commands/utils.cpp --std=c++11 -lmysqlclient -i query`
+
+An example query is:
+
+`./query -u brendabrandy -r https://github.com/brendabrandy/welcome-android.git --from 2016-12-16 -l 5`
+
 # Required Packages and Dependencies
 
 1. Install git
