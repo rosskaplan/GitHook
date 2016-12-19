@@ -7,21 +7,22 @@ Introducing GITHOOK Documentation!  We'll run some scripts automatically each ti
 ## Functionality
 1. Autogenerating wiki : After the package is installed, whenever you enter a commit, a related comment about the commit would appear in the wiki!
 
-2. Full import wiki
+3. Full export wiki : You can generate a csv file with the full export function, and then do your own analytics and manipulation with the csv file.
 
-3. Full export wiki 
+4. add / remove tag : add and remove tags if you've written something wrong!
 
-4. add / remove tag
-
-5. Summary of github
+5. Querying : You can query a specific repo that is in the database and specify user / tags / time / limit !
 
 ## Sample usage
 
 To commit with tags of your own choice:
 `git commit -m "*Animations* *Internet Explorer Bugs* *Geolocation Bugs* Javascript plugins on all contact us pages now work for Internet Explorer 9!"`
 
-## Required Packages
-1. Install mysql C library
+## Required Packages and Dependencies
+
+1. Install git
+2. Install MYSQL C library
+3. The system is tested on UBUNTU
 
 ## Setup
 
@@ -32,10 +33,10 @@ To commit with tags of your own choice:
 5. Change directory with `cd ./GitHook-master` and delete .gitsubmodules and wiki/ with `rm .gitsubmodules` and `rm -r wiki/`
 6. Run installation script `bash install/install.sh`
 7. Go to the github webclient and go to the wiki tab. If it does not appear, go to settings and enable it.  Once in the wiki tab, click save wiki on the default first wiki.
+8. Make sure the environment variable $GIT_AUTHOR_NAME is your github username!
+
 
 You should now be all setup!  All commits should come from your normal directory (the one with the .git in it!)
 
-## Ideas for functionality
 
-Access level for public repo vs private repo
 
