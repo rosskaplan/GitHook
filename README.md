@@ -1,8 +1,8 @@
 ## GitHook
 
-Ever project since the beginning of time has had insufficient documentation. Doesn't matter who you are , whether it's for school, professional or personal, nothing. Documentation is annoying to write and can waste precious developer time. 
+Every project since the beginning of time has had insufficient documentation. Doesn't matter who you are, whether it's for school, professional or personal, irrelevant!  Documentation is annoying to write and can waste precious developer time. 
 
-Introducing GITHOOK Documentation!  we'll run some scripts each time you commit that make the documentation for you!  Just include tags in your commit message wrapped in asterisks and it'll create a wiki page on your github for all commits using that tag!
+Introducing GITHOOK Documentation!  We'll run some scripts automatically each time you commit that make the documentation for you!  Just include tags in your commit message wrapped in asterisks and it'll create a wiki page on your github for all commits using that tag!
 
 ## Functionality
 1. Autogenerating wiki : After the package is installed, whenever you enter a commit, a related comment about the commit would appear in the wiki!
@@ -37,7 +37,4 @@ You should now be all setup!  All commits should come from your normal directory
 
 ## Ideas for functionality
 
-1. Full import 
-2. Full export
-3. Access level for public repo vs private repo
-4. Query 
+Access level for public repo vs private repo
