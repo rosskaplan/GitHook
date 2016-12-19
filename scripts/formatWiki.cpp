@@ -16,7 +16,28 @@ using namespace std;
 
 MYSQL *mysql;
 string rid;
-// 
+//
+void makeLink(fstream& fs, string hasher){
+    // need a global rid
+    fs << " [link](";
+    string q = "SELECT rurl FROM repo WHERE repo.rid=+"+rid+";";
+    if (mysql_query(mysql, q.c_str()) != 0){
+        finish_with_error(mysql, "querying the database");
+        exit(-1);
+    }
+
+    MYSQL_RES *result;
+
+    if ((result=mysql_store_result(mysql)) == NULL){
+        finish_with_error(mysql, "storing result from database");
+    }
+    MYSQL_ROW row;
+    row = mysql_fetch_row(result);
+    fs << (string)row[0] << "/commit/"<<hasher<<")";
+    return;
+
+}
+ 
 void addToPage(string commitLine, string tag, string hasher){
     string q, purl, tid;
     int num_rows;
@@ -75,9 +96,12 @@ void addToPage(string commitLine, string tag, string hasher){
         // as of now, make it so that new commits are added at the end
         // TODO: make the new commits the top;
     }
-
+    
     fs << "[comment]: "<< hasher << endl << endl;
-    fs << commitLine << endl << endl;
+    fs << commitLine;
+    makeLink(fs, hasher);
+    fs << endl << endl;
+    
     fs.close();
     // first see whether the page to the tag exist
     // if it exist, 

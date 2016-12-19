@@ -221,7 +221,7 @@ int main(int argc, char** argv) {
     mysql_close(mysql);
     int pid;
     char ** newargs = (char**)malloc(4*sizeof(char*));
-    string commandore="./scripts/formatWiki";
+    string commandore="./.git/GitHook-master/scripts/formatWiki";
     newargs[0] = (char*)commandore.c_str();
     newargs[1] = (char*)hash.c_str();
     newargs[2] = (char*)rid.c_str();
