@@ -20,6 +20,7 @@ Introducing GITHOOK Documentation!  We'll run some scripts automatically each ti
 `git add *` 
 
 To commit with tags of your own choice:
+
 `git commit -m "*Animations* *Internet Explorer Bugs* *Geolocation Bugs* Javascript plugins on all contact us pages now work for Internet Explorer 9!"`
 
 `git push origin master`
@@ -29,6 +30,30 @@ To commit with tags of your own choice:
 To compile the command, please run:
 
 `g++ ./.git/GitHook-master/commands/exportwiki.cpp ./.git/GitHook-master/commands/utils.cpp -lmysqlclient -o exportwiki`
+
+To export a certain wiki (e.g. the wiki of https://github.com/brendabrandy/welcome-android.git), run:
+
+`./exportwiki -r https://github.com/brendabrandy/welcome-android.git -f export.csv`
+
+## Remove tag by hash
+
+To compile the command, please run
+
+`g++ ./.git/GitHook-master/scripts/removeTagByHash.cpp -o removeTagByHash -lmysqlclient`
+
+To remove a tag from the hash 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa':
+
+`./removeTagByHash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa tagname`
+
+## Add tag by hash
+
+To compile the command, please run
+
+`g++ ./.git/GitHook-master/commands/addTagByHash.cpp -o addTagByHash -lmysqlclient`
+
+To add a tag to the hash 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa':
+
+`./addTagByHash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa tagname`
 
 # Required Packages and Dependencies
 
