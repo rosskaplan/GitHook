@@ -89,6 +89,8 @@ An example query is:
 # Setup
 1. Make sure you initialize the git repository and connected it with a github url that you own! If you do not own a github repo and still want to test a system out, you can fork a github repo from [https://github.com/brendabrandy/welcome-android](https://github.com/brendabrandy/welcome-android)
 
+With the above link, your_name would be brendabrandy and your_repository would be welcome-android
+
 ```
 git init
 git remote add origin https://github.com/your_name/your_repository.git`
@@ -100,10 +102,10 @@ git pull origin master`
 3. Place the zip in the .git folder of your local repository
 4. Change directory with `cd ./.git`
 5. Unzip the zip file with `unzip GitHook-master.zip`
-6. Change directory with `cd ./GitHook-master` and delete .gitsubmodules and wiki/ with `rm .gitsubmodules` and `rm -r wiki/`
+6. Change directory with `cd ./GitHook-master` and delete .gitmodules and wiki/ with `rm .gitmodules` and `rm -r wiki/`
 7. Run installation script `bash install/install.sh`
 8. Go to the github webclient and go to the wiki tab. If it does not appear, go to settings and enable it.  Once in the wiki tab, click save wiki on the default first wiki.
 9. Make sure the environment variable $GIT_AUTHOR_NAME is your github username!
-
+10. You can start using GitHook now!
 
 You should now be all setup!  All commits should come from your normal directory (the one with the .git in it!)

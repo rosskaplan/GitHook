@@ -423,6 +423,12 @@ int insertCommit(string message, string hash, string username, string file, stri
     if (!row) {
         return 0;
     }
+
+    /*int num_rows = mysql_num_rows(result);
+    if(num_rows != 0){
+        return 0;
+    }*/
+
     string fid = (string)row[0];
 
     temp = "SELECT * FROM commits WHERE commits.fid='"+fid+"' AND commits.hash='"+hash+"';";
@@ -433,13 +439,19 @@ int insertCommit(string message, string hash, string username, string file, stri
 
     // Store the result of the query
     result = mysql_store_result(mysql);
-    if (result == NULL){
+    /*if (result == NULL){
         finish_with_error(mysql, 4);
         return 0;
     }
     row = mysql_fetch_row(result);
     if (!row) {
         return 1;
+    }*/
+
+
+    int num_rows= mysql_num_rows(result);
+    if (num_rows != 0){
+        return 0;
     }
 
     time_t now = time(0);
