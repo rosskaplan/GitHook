@@ -7,15 +7,13 @@ Introducing GITHOOK Documentation!  we'll run some scripts each time you commit 
 ## Functionality
 1. Autogenerating wiki : After the package is installed, whenever you enter a commit, a related comment about the commit would appear in the wiki!
 
-2. Full import wiki (not done yet)
+2. Full import wiki
 
 3. Full export wiki 
 
-4. change name of tag (not done yet)
+4. add / remove tag
 
-5. add / remove tag (not done yet)
-
-6. Summary of github (90% done, still need to add tally of tags)
+5. Summary of github
 
 ## Sample usage
 
@@ -27,11 +25,15 @@ To commit with tags of your own choice:
 
 ## Setup
 
-1. Download the zip folder of this github.
-2. Place the zip folder in the .git folder of your local repository
+1. Download the zip folder of this github into the repository you want this plugin to work within
+2. Place the zip in the .git folder of your local repository
 3. Change directory with `cd ./.git`
 4. Unzip the zip file with `unzip GitHook-master.zip`
-5. Change directory with `cd ./GitHook-master` and run installation script `bash install/install.sh`
+5. Change directory with `cd ./GitHook-master` and delete .gitsubmodules and wiki/ with `rm .gitsubmodules` and `rm -r wiki/`
+6. Run installation script `bash install/install.sh`
+7. Go to the github webclient and go to the wiki tab. If it does not appear, go to settings and enable it.  Once in the wiki tab, click save wiki on the default first wiki.
+
+You should now be all setup!  All commits should come from your normal directory (the one with the .git in it!)
 
 ## Ideas for functionality
 
