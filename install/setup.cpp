@@ -33,6 +33,9 @@ int main(int argc, char** argv){
         }else if (strcmp(argv[i], "-u") == 0){
             // enter repo url
             rurl = argv[i+1];
+            string git = ".git";
+            if (strcmp(rurl.substr(rurl.length()-4).c_str(),git.c_str()) ==0)
+                rurl=rurl.substr(0,rurl.length()-4);
         }else if (strcmp(argv[i], "-w") == 0){
             // enter wiki url
             wurl = argv[i+1];
