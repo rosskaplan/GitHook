@@ -85,16 +85,25 @@ An example query is:
 2. Install MYSQL C library
 3. The system is tested on ubuntu 16.04
 
-# Setup
 
-1. Download the zip folder of this github into the repository you want this plugin to work within
-2. Place the zip in the .git folder of your local repository
-3. Change directory with `cd ./.git`
-4. Unzip the zip file with `unzip GitHook-master.zip`
-5. Change directory with `cd ./GitHook-master` and delete .gitsubmodules and wiki/ with `rm .gitsubmodules` and `rm -r wiki/`
-6. Run installation script `bash install/install.sh`
-7. Go to the github webclient and go to the wiki tab. If it does not appear, go to settings and enable it.  Once in the wiki tab, click save wiki on the default first wiki.
-8. Make sure the environment variable $GIT_AUTHOR_NAME is your github username!
+# Setup
+1. Make sure you initialize the git repository and connected it with a github url that you own! If you do not own a github repo and still want to test a system out, you can fork a github repo from [https://github.com/brendabrandy/welcome-android](https://github.com/brendabrandy/welcome-android)
+
+```
+git init
+git remote add origin https://github.com/your_name/your_repository.git`
+git pull origin master`
+```
+
+
+2. Download the zip folder of this github into the repository you want this plugin to work within
+3. Place the zip in the .git folder of your local repository
+4. Change directory with `cd ./.git`
+5. Unzip the zip file with `unzip GitHook-master.zip`
+6. Change directory with `cd ./GitHook-master` and delete .gitsubmodules and wiki/ with `rm .gitsubmodules` and `rm -r wiki/`
+7. Run installation script `bash install/install.sh`
+8. Go to the github webclient and go to the wiki tab. If it does not appear, go to settings and enable it.  Once in the wiki tab, click save wiki on the default first wiki.
+9. Make sure the environment variable $GIT_AUTHOR_NAME is your github username!
 
 
 You should now be all setup!  All commits should come from your normal directory (the one with the .git in it!)

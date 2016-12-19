@@ -1,11 +1,7 @@
 // Name : Brenda So
 // Date : 12/5/2016
 // Description : export commits to a csv file, if -n is not specified, then the current url is assumed to be the thing to export from
-// --sort-by specified whether you want to sort by date, name or tags. date is the automatic tag 
 // -f would be the output file name, if not the name would automatically be new.csv
-// --from specifies a start date
-// --to specifies an end date
-// --merge-tags imply that all tags would be merged. default is false;
 
 #include <iostream>
 #include <fstream>
