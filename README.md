@@ -15,8 +15,23 @@ Introducing GITHOOK Documentation!  We'll run some scripts automatically each ti
 
 ## Sample usage
 
+# Autogenerate wiki during commits. 
+
+`git add *` 
+
 To commit with tags of your own choice:
 `git commit -m "*Animations* *Internet Explorer Bugs* *Geolocation Bugs* Javascript plugins on all contact us pages now work for Internet Explorer 9!"`
+
+`git push origin master`
+
+# Full export wiki
+
+To compile the command, please run:
+
+`g++ ./.git/GitHook-master/commands/exportwiki.cpp ./.git/GitHook-master/commands/utils.cpp -lmysqlclient -o exportwiki`
+
+
+
 
 ## Required Packages and Dependencies
 
