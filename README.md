@@ -79,6 +79,14 @@ An example query is:
 
 `./query -u brendabrandy -r https://github.com/brendabrandy/welcome-android.git --from 2016-12-16 -l 5`
 
+To test the query function on a larger database, you can check out the 2048 repo and bootstrap repo. Some fun queries could be:
+
+```
+./query -u Gabriele\ Cirulli -r https://github.com/gabrielecirulli/2048 -t graphics -l 5
+./query -u Anna\ Harren -r https://github.com/gabrielecirulli/2048 -l 1
+./query -r https://github.com/twbs/bootstrap -u wangsai --from 2016-12-16 -l 10
+```
+
 # Required Packages and Dependencies
 
 1. Install git
