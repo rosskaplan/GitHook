@@ -1,10 +1,10 @@
-## GitHook
+# GitHook
 
 Every project since the beginning of time has had insufficient documentation. Doesn't matter who you are, whether it's for school, professional or personal, irrelevant!  Documentation is annoying to write and can waste precious developer time. 
 
 Introducing GITHOOK Documentation!  We'll run some scripts automatically each time you commit that make the documentation for you!  Just include tags in your commit message wrapped in asterisks and it'll create a wiki page on your github for all commits using that tag!
 
-## Functionality
+# Functionality
 1. Autogenerating wiki : After the package is installed, whenever you enter a commit, a related comment about the commit would appear in the wiki!
 
 3. Full export wiki : You can generate a csv file with the full export function, and then do your own analytics and manipulation with the csv file.
@@ -13,9 +13,9 @@ Introducing GITHOOK Documentation!  We'll run some scripts automatically each ti
 
 5. Querying : You can query a specific repo that is in the database and specify user / tags / time / limit !
 
-## Sample usage
+# Sample usage
 
-# Autogenerate wiki during commits. 
+## Autogenerate wiki during commits. 
 
 `git add *` 
 
@@ -24,22 +24,19 @@ To commit with tags of your own choice:
 
 `git push origin master`
 
-# Full export wiki
+## Full export wiki
 
 To compile the command, please run:
 
 `g++ ./.git/GitHook-master/commands/exportwiki.cpp ./.git/GitHook-master/commands/utils.cpp -lmysqlclient -o exportwiki`
 
-
-
-
-## Required Packages and Dependencies
+# Required Packages and Dependencies
 
 1. Install git
 2. Install MYSQL C library
 3. The system is tested on ubuntu 16.04
 
-## Setup
+# Setup
 
 1. Download the zip folder of this github into the repository you want this plugin to work within
 2. Place the zip in the .git folder of your local repository
@@ -52,6 +49,3 @@ To compile the command, please run:
 
 
 You should now be all setup!  All commits should come from your normal directory (the one with the .git in it!)
-
-
-
