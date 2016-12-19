@@ -22,7 +22,7 @@ To commit with tags of your own choice:
 
 1. Install git
 2. Install MYSQL C library
-3. The system is tested on UBUNTU
+3. The system is tested on ubuntu 16.04
 
 ## Setup
 
