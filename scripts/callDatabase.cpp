@@ -221,7 +221,7 @@ int main(int argc, char** argv) {
     mysql_close(mysql);
     int pid;
     char ** newargs = (char**)malloc(4*sizeof(char*));
-    string commandore="./.git/GitHook-master/scripts/formatWiki";
+    string commandore="./scripts/formatWiki";
     newargs[0] = (char*)commandore.c_str();
     newargs[1] = (char*)hash.c_str();
     newargs[2] = (char*)rid.c_str();
@@ -412,6 +412,7 @@ int insertCommit(string message, string hash, string username, string file, stri
         finish_with_error(mysql,3);
         return 0;
     }
+
     // Store the result of the query
     result = mysql_store_result(mysql);
     if (result == NULL){
@@ -432,13 +433,12 @@ int insertCommit(string message, string hash, string username, string file, stri
 
     // Store the result of the query
     result = mysql_store_result(mysql);
-    /*if (result != NULL){
+    if (result == NULL){
         finish_with_error(mysql, 4);
         return 0;
-    }*/
-    int number = mysql_num_rows(result);
-    //row = mysql_fetch_row(result);
-    if (number != 0) {
+    }
+    row = mysql_fetch_row(result);
+    if (!row) {
         return 1;
     }
 
@@ -449,6 +449,7 @@ int insertCommit(string message, string hash, string username, string file, stri
     string timetemp = to_string((ltm->tm_year)+1900)+"-"+to_string(ltm->tm_mon+1)+"-"+to_string(ltm->tm_mday)+" "+to_string(ltm->tm_hour)+":"+to_string(ltm->tm_min)+":"+to_string(1+ltm->tm_sec);
 
     temp = "INSERT INTO commits VALUES (NULL, '"+message+"', '"+fid+"', '"+hash+"', '"+timetemp+"','"+username+"', '"+rid+"');";
+
     if (mysql_query(mysql, temp.c_str())){
         finish_with_error(mysql,3);
         return 0;

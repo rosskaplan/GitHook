@@ -35,6 +35,10 @@ string hasAccess(MYSQL *con, string username, string repourl){
 }
 
 string existDB(MYSQL *con, string repo_link){
+    string git = ".git";
+    if (strcmp(repo_link.substr(repo_link.length()-4).c_str(), git.c_str()) == 0)
+        repo_link = repo_link.substr(0, repo_link.length()-4);
+ 
     string q = "SELECT DISTINCT R.rid FROM repo R where R.rurl='"+repo_link+"'";
     MYSQL_ROW row;
     bool exist;
