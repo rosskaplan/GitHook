@@ -33,5 +33,5 @@ cd install
 # Step 4 : Populate the database with all the necessary information, including
 # reponame, username, wiki, files contained in github
 # it is assumed that the github wiki is empty
-make
+g++ --std=c++11 setup.cpp -o setup -lmysqlclient
 ./setup -u "$repo_link" -e "$author_name" -r "$repo_real_name" -w "$new_link"
